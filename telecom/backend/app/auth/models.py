@@ -2,7 +2,7 @@ import uuid
 
 from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
 
@@ -18,3 +18,4 @@ class User(Base):
     username: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     full_name: Mapped[str] = mapped_column(String, nullable=False)
     password_hash: Mapped[str] = mapped_column(String, nullable=False)
+    subscriptions = relationship("Subscription", back_populates="user")
