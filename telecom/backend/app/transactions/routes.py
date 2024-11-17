@@ -16,4 +16,5 @@ def update_transaction_status(OrderStatusUpdateRequest: OrderStatusUpdateRequest
     Note: This endpoint is called by the PSP to update the status of a transaction. Currently,
     it lacks mechanisms to authenticate the PSP (e.g., API keys, signatures, etc.).
     """
+    # TODO: Implement method
     return {"detail": "Status updated."}
