@@ -1,0 +1,11 @@
+version: '3'
+services:
+  bank-1-database:
+    container_name: bank-1-database
+    image: postgres
+    ports:
+      - 5441:5432
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dbname

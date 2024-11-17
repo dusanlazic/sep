@@ -1,0 +1,11 @@
+version: '3'
+services:
+  psp-card-database:
+    container_name: psp-card-database
+    image: postgres
+    ports:
+      - 5451:5432
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dbname

@@ -1,0 +1,11 @@
+version: '3'
+services:
+  psp-crypto-database:
+    container_name: psp-crypto-database
+    image: postgres
+    ports:
+      - 5453:5432
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dbname

@@ -33,5 +33,5 @@ docker run -d \
 Run FastAPI app:
 
 ```sh
-uv run fastapi dev --port 8010
+uv run fastapi dev --port 8024
 ```

@@ -1,0 +1,11 @@
+version: '3'
+services:
+  psp-core-database:
+    container_name: psp-core-database
+    image: postgres
+    ports:
+      - 5450:5432
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dbname

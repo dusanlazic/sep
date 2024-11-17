@@ -1,0 +1,11 @@
+version: '3'
+services:
+  pcc-database:
+    container_name: pcc-database
+    image: postgres
+    ports:
+      - 5442:5432
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dbname
