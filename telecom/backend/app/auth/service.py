@@ -1,5 +1,3 @@
-from uuid import UUID
-
 import jwt
 from fastapi import HTTPException, Response
 from passlib.context import CryptContext
