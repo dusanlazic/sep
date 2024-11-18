@@ -1,4 +1,4 @@
-from pydantic import AwareDatetime, BaseModel, PositiveFloat, PositiveInt
+from pydantic import AwareDatetime, BaseModel, HttpUrl, PositiveFloat, PositiveInt
 
 
 class OfferResponse(BaseModel):
@@ -16,6 +16,10 @@ class SubscriptionResponse(BaseModel):
     start_date: AwareDatetime
     end_date: AwareDatetime
     auto_renew: bool
+
+
+class PaymentInitiatedResponse(BaseModel):
+    payment_url: HttpUrl
 
 
 class SubscriptionRequest(BaseModel):

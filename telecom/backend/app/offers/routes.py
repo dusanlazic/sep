@@ -4,7 +4,12 @@ from fastapi import APIRouter, Depends
 
 from ..auth.dependencies import get_current_user
 from . import service
-from .schemas import OfferResponse, SubscriptionRequest, SubscriptionResponse
+from .schemas import (
+    OfferResponse,
+    PaymentInitiatedResponse,
+    SubscriptionRequest,
+    SubscriptionResponse,
+)
 
 router = APIRouter(prefix="/offers", tags=["Offers"])
 
@@ -27,12 +32,12 @@ def get_subscriptions(
     pass
 
 
-@router.post("/subscriptions", response_model=SubscriptionResponse)
+@router.post("/subscriptions", response_model=PaymentInitiatedResponse)
 def subscribe_to_offer(
     subscription_request: SubscriptionRequest,
     current_user_id: UUID = Depends(get_current_user),
-) -> SubscriptionResponse:
+) -> PaymentInitiatedResponse:
     """
     Subscribe to an offer.
     """
-    pass
+    return PaymentInitiatedResponse(payment_url="http://psp.local/order/123")
