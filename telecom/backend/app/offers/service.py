@@ -1,13 +1,12 @@
 from sqlalchemy.orm import Session
 
 from .models import *
-from .schemas import OfferResponse, SubscriptionResponse
 
 
-def get_offers(db: Session) -> list[OfferResponse]:
+def get_offers(db: Session) -> list[Offer]:
     offers = db.query(Offer).all()
-    return [OfferResponse(identifier=o.identifier, title=o.title, description=o.description, price=o.price) for o in offers]
+    return offers
 
-def get_subscriptions(db: Session, user_id: UUID) -> list[SubscriptionResponse]:
+def get_subscriptions(db: Session, user_id: UUID) -> list[Subscription]:
     user = db.query(User).filter(User.id == user_id).first()
-    return [SubscriptionResponse(offer_identifier=s.identifier,) for s in user.subscriptions]
+    return user.subscriptions
