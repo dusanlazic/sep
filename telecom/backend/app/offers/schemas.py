@@ -1,7 +1,18 @@
-from pydantic import AwareDatetime, BaseModel, HttpUrl, PositiveFloat, PositiveInt
+from pydantic import (
+    AliasPath,
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    HttpUrl,
+    PositiveFloat,
+    PositiveInt,
+)
 
 
 class OfferResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     identifier: str
     title: str
     description: str
@@ -9,10 +20,12 @@ class OfferResponse(BaseModel):
 
 
 class SubscriptionResponse(BaseModel):
-    offer_identifier: str
-    title: str
-    description: str
-    price: PositiveFloat
+    model_config = ConfigDict(from_attributes=True)
+
+    offer_identifier: str = Field(alias=AliasPath("offer", "identifier"))
+    title: str = Field(alias=AliasPath("offer", "title"))
+    description: str = Field(alias=AliasPath("offer", "description"))
+    price: PositiveFloat = Field(alias=AliasPath("offer", "price"))
     start_date: AwareDatetime
     end_date: AwareDatetime
     auto_renew: bool
