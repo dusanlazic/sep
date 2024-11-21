@@ -2,9 +2,19 @@ services:
   bank-db:
     container_name: bank-db
     image: postgres
-    ports:
-      - 5432:5432
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: dbname
+
+  bank-backend:
+    container_name: bank-backend
+    image: fastapi-hot-reload
+    command: bash -c "uv run fastapi dev --port 9000"
+    user: "${UID}:${GID}"
+    volumes:
+      - ./backend:/backend
+    working_dir: /backend
+    depends_on:
+      bank-db:
+        condition: service_started

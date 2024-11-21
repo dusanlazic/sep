@@ -2,9 +2,19 @@ services:
   psp-card-handler-db:
     container_name: psp-card-handler-db
     image: postgres
-    ports:
-      - 5432:5432
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: dbname
+
+  psp-card-handler-backend:
+    container_name: psp-card-handler-backend
+    image: fastapi-hot-reload
+    command: bash -c "uv run fastapi dev --port 9000"
+    user: "${UID}:${GID}"
+    volumes:
+      - ./backend:/backend
+    working_dir: /backend
+    depends_on:
+      psp-card-handler-db:
+        condition: service_started

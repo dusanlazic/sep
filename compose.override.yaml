@@ -1,32 +1,66 @@
+---
 services:
   bank-db:
-    ports: !override
+    ports:
       - 5432:5432
-  
+  bank-backend:
+    ports:
+      - 9432:9000
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://user:password@bank-db/dbname
   pcc-db:
-    ports: !override
+    ports:
       - 5433:5432
-  
+  pcc-backend:
+    ports:
+      - 9433:9000
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://user:password@pcc-db/dbname
   psp-core-db:
-    ports: !override
+    ports:
       - 5434:5432
-
+  psp-core-backend:
+    ports:
+      - 9434:9000
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://user:password@psp-core-db/dbname
   psp-card-handler-db:
-    ports: !override
+    ports:
       - 5435:5432
-
+  psp-card-handler-backend:
+    ports:
+      - 9435:9000
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://user:password@psp-card-handler-db/dbname
   psp-crypto-handler-db:
-    ports: !override
+    ports:
       - 5436:5432
-  
+  psp-crypto-handler-backend:
+    ports:
+      - 9436:9000
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://user:password@psp-crypto-handler-db/dbname
   psp-paypal-handler-db:
-    ports: !override
+    ports:
       - 5437:5432
-
+  psp-paypal-handler-backend:
+    ports:
+      - 9437:9000
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://user:password@psp-paypal-handler-db/dbname
   psp-qr-handler-db:
-    ports: !override
+    ports:
       - 5438:5432
-
+  psp-qr-handler-backend:
+    ports:
+      - 9438:9000
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://user:password@psp-qr-handler-db/dbname
   telecom-db:
-    ports: !override
-      - 5439:5432  
+    ports:
+      - 5439:5432
+  telecom-backend:
+    ports:
+      - 9439:9000
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://user:password@telecom-db/dbname
