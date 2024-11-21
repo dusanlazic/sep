@@ -1,3 +1,19 @@
+<script setup>
+import { useAuthStore } from '@/stores/auth.store';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+const authStore = useAuthStore();
+
+const goToSubscribe = () => {
+  if (!authStore.isUserLoggedIn()) {
+    router.push('/login');
+  } else {
+    router.push('/subscribe');
+  }
+};
+</script>
+
 <template>
   <div class="bg-gray-50">
     <header class="flex flex-col justify-center min-h-screen bg-[radial-gradient(#e5e7eb_1.5px,transparent_1.5px)] sm:bg-[radial-gradient(#e2e4e9_1px,transparent_1px)]
@@ -7,13 +23,11 @@
         <p class="mt-2 text-lg">
           Experience lightning-fast internet and reliable telecom services tailored for you.
         </p>
-        <RouterLink to="/subscribe">
-          <button
-            class="mt-10 px-8 py-3 bg-white font-semibold rounded shadow hover:bg-violet-300 border-black border-dashed border"
-          >
-            Subscribe Now
-          </button>
-        </RouterLink>
+        <button @click="goToSubscribe"
+          class="mt-10 px-8 py-3 bg-white font-semibold rounded shadow hover:bg-violet-300 border-black border-dashed border"
+        >
+          Subscribe Now
+        </button>
       </div>
     </header>
 
@@ -50,15 +64,13 @@
       <div class="container mx-auto px-6 py-20 text-center">
         <h2 class="text-2xl font-bold">Ready to get started?</h2>
         <p class="mt-2">
-          Join thousands of satisfied customers enjoying SwiftNet's services.
+          Join thousands of satisfied customers enjoying Telecom Serbia's services.
         </p>
-        <RouterLink to="/subscribe">
-          <button
+          <button @click="goToSubscribe"
             class="mt-6 px-8 py-3 bg-white text-black font-semibold rounded shadow hover:bg-gray-100"
           >
             Subscribe Now
           </button>
-        </RouterLink>
       </div>
     </section>
   </div>

@@ -43,9 +43,24 @@ export const useAuthStore = defineStore('auth', () => {
       console.error(error);
       return false;
     }
-  }
+  };
 
-  async function signOut() {
+  async function register(data) {
+    try {
+      const response = await ax.post('/auth/register', data);
+  
+      if (!response?.data) {
+        return false;
+      }
+  
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
+
+  async function logout() {
     await ax.post(
       '/auth/logout',
     );
@@ -57,5 +72,9 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('session');
   };
 
-  return { session, fetchSession, clearSession, login, signOut };
+  function isUserLoggedIn() {
+    return !!session.value || !!localStorage.getItem('session');
+  };
+
+  return { session, fetchSession, clearSession, login, logout, isUserLoggedIn, register };
 });
