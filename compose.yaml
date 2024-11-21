@@ -1,0 +1,13 @@
+include:
+  - bank/compose.yaml
+  - pcc/compose.yaml
+  - psp/compose.yaml
+  - telecom/compose.yaml
+
+services:
+  logsea:
+    image: dusanlazic/logsea
+    ports:
+      - "8000:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

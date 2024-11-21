@@ -1,0 +1,6 @@
+include:
+  - card-handler/compose.yaml
+  - core/compose.yaml
+  - crypto-handler/compose.yaml
+  - paypal-handler/compose.yaml
+  - qr-handler/compose.yaml

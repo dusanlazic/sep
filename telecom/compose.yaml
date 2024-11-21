@@ -1,10 +1,9 @@
-version: '3'
 services:
-  psp-core-database:
-    container_name: psp-core-database
+  telecom-db:
+    container_name: telecom-db
     image: postgres
     ports:
-      - 5450:5432
+      - 5432:5432
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password

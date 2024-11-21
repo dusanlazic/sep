@@ -1,0 +1,32 @@
+services:
+  bank-db:
+    ports: !override
+      - 5432:5432
+  
+  pcc-db:
+    ports: !override
+      - 5433:5432
+  
+  psp-core-db:
+    ports: !override
+      - 5434:5432
+
+  psp-card-handler-db:
+    ports: !override
+      - 5435:5432
+
+  psp-crypto-handler-db:
+    ports: !override
+      - 5436:5432
+  
+  psp-paypal-handler-db:
+    ports: !override
+      - 5437:5432
+
+  psp-qr-handler-db:
+    ports: !override
+      - 5438:5432
+
+  telecom-db:
+    ports: !override
+      - 5439:5432  

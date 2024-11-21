@@ -1,10 +1,9 @@
-version: '3'
 services:
-  pcc-database:
-    container_name: pcc-database
+  psp-qr-handler-db:
+    container_name: psp-qr-handler-db
     image: postgres
     ports:
-      - 5442:5432
+      - 5432:5432
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password

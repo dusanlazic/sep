@@ -6,7 +6,9 @@ class Config(BaseSettings):
     database_url: PostgresDsn
     psp_api_key: str
 
-    model_config = SettingsConfigDict(env_file=(".develop.env", ".env"), extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=(".env.example", ".develop.env", ".env"), extra="ignore"
+    )
 
 
 config = Config()

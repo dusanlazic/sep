@@ -1,10 +1,9 @@
-version: '3'
 services:
-  psp-paypal-database:
-    container_name: psp-paypal-database
+  psp-crypto-handler-db:
+    container_name: psp-crypto-handler-db
     image: postgres
     ports:
-      - 5452:5432
+      - 5432:5432
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password

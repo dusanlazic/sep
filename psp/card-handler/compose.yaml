@@ -1,10 +1,9 @@
-version: '3'
 services:
-  psp-qr-database:
-    container_name: psp-qr-database
+  psp-card-handler-db:
+    container_name: psp-card-handler-db
     image: postgres
     ports:
-      - 5454:5432
+      - 5432:5432
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password

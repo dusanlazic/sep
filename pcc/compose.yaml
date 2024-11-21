@@ -1,10 +1,9 @@
-version: '3'
 services:
-  telecom-db:
-    container_name: telecom-db
+  pcc-db:
+    container_name: pcc-db
     image: postgres
     ports:
-      - 5440:5432
+      - 5432:5432
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
