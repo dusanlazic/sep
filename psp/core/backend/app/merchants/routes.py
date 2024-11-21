@@ -10,10 +10,10 @@ from .schemas import (
     MerchantRegistrationRequest,
 )
 
-router = APIRouter(prefix="/merchants", tags=["Merchant Management"])
+router = APIRouter(prefix="/merchants")
 
 
-@router.post("/register")
+@router.post("/register", tags=["Merchant Manager"])
 def register(new_merchant: MerchantRegistrationRequest):
     """
     Registers a new merchant.
@@ -21,7 +21,9 @@ def register(new_merchant: MerchantRegistrationRequest):
     return {"detail": "Merchant registered."}
 
 
-@router.post("/login", response_model=MerchantBriefDataResponse)
+@router.post(
+    "/login", response_model=MerchantBriefDataResponse, tags=["Merchant Manager"]
+)
 def login(creds: MerchantLoginRequest) -> MerchantBriefDataResponse:
     """
     Issues an access token cookie to the merchant.
@@ -29,8 +31,8 @@ def login(creds: MerchantLoginRequest) -> MerchantBriefDataResponse:
     pass
 
 
-@router.post("/logout")
-def logout(response: Response) -> dict[str, str]:
+@router.post("/logout", tags=["Merchant Manager"])
+def logout(response: Response):
     """
     Unset the merchant's access token cookie.
     """
@@ -42,6 +44,7 @@ def logout(response: Response) -> dict[str, str]:
     "/me",
     response_model=MerchantBriefDataResponse,
     dependencies=[Depends(get_current_merchant_manager)],
+    tags=["Merchant Manager"],
 )
 def get_current_merchant_manager(
     current_user_id: UUID = Depends(get_current_merchant_manager),
@@ -54,8 +57,8 @@ def get_current_merchant_manager(
 
 @router.get(
     "/me/api-key",
-    response_model=MerchantBriefDataResponse,
     dependencies=[Depends(get_current_merchant_manager)],
+    tags=["Merchant Manager"],
 )
 def get_api_key(
     current_user_id: UUID = Depends(get_current_merchant_manager),

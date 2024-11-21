@@ -31,6 +31,9 @@ class Merchant(Base):
     api_key: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     configuration_json: Mapped[dict] = mapped_column(JSONB, nullable=False)
 
+    # configuration_json is a JSONB field that stores the merchant's payment methods configuration in JSON format.
+    # It includes enabled payment methods.
+
     def get_configuration_yaml(self) -> str:
         """
         Converts the JSON configuration to YAML with fields in a specific order.
@@ -69,7 +72,7 @@ class Merchant(Base):
             sort_keys=False,
         )
 
-    def get_supported_payment_methods(self) -> list[str]:
+    def get_supported_payment_method_names(self) -> list[str]:
         """
         Retrieves the names of the payment methods supported by the merchant.
         """
@@ -84,3 +87,9 @@ class Merchant(Base):
                 return method["config"]
 
         raise ValueError(f"Payment method {name} not found in the configuration.")
+
+    def get_urls(self) -> dict:
+        """
+        Retrieves the URLs from the configuration.
+        """
+        return self.configuration_json["urls"]

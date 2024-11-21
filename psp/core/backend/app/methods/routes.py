@@ -9,10 +9,14 @@ from .schemas import (
     PaymentMethodResponse,
 )
 
-router = APIRouter(prefix="/payment-methods", tags=["Payment Methods"])
+router = APIRouter(prefix="/payment-methods")
 
 
-@router.get("/", response_model=list[PaymentMethodResponse])
+@router.get(
+    "/",
+    response_model=list[PaymentMethodResponse],
+    tags=["PSP Admin", "Merchant Manager"],
+)
 def get_payment_methods():
     """
     Retrieve all payment methods supported by the PSP.
@@ -24,6 +28,7 @@ def get_payment_methods():
     "/",
     dependencies=[Depends(is_admin)],
     response_model=PaymentMethodResponse,
+    tags=["PSP Admin"],
 )
 def add_payment_method(new_payment_method: PaymentMethodCreateRequest):
     """
@@ -36,11 +41,12 @@ def add_payment_method(new_payment_method: PaymentMethodCreateRequest):
 @router.get(
     "/config",
     dependencies=[Depends(get_current_merchant_manager)],
-    response_model=list[MerchantPaymentMethodConfigurationResponse],
+    response_model=MerchantPaymentMethodConfigurationResponse,
+    tags=["Merchant Manager"],
 )
 def get_merchant_payment_methods_configuration():
     """
-    Retrieve the configuration of payment methods enabled for the current merchant.
+    Retrieve configurations for each payment methods enabled for the current merchant.
     """
     pass
 
@@ -49,12 +55,13 @@ def get_merchant_payment_methods_configuration():
     "/config",
     dependencies=[Depends(get_current_merchant_manager)],
     response_model=MerchantPaymentMethodConfigurationResponse,
+    tags=["Merchant Manager"],
 )
 def set_merchant_payment_method_configuration(
     new_configuration: MerchantPaymentMethodConfigurationRequest,
 ):
     """
-    Set the configuration of payment methods enabled for the current merchant.
+    Configure all payment methods for the current merchant.
     """
     pass
     # TODO: PSP Core should sync the configuration across all the handlers.
