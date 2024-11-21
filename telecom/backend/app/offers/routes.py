@@ -44,4 +44,5 @@ def subscribe_to_offer(
     """
     Subscribe to an offer.
     """
+    # TODO: Check if user has an active subscription
     return PaymentInitiatedResponse(payment_url="http://psp.local/order/123")
