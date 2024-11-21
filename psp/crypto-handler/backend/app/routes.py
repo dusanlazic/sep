@@ -1,19 +1,52 @@
 from fastapi import APIRouter
 
-from .schemas import BarResponse, FooRequest
+from .schemas import (
+    ConfigureMerchantRequest,
+    HandlerConfigurationSchemaResponse,
+    MerchantConfiguration,
+    TransactionProceedRequest,
+    TransactionProceedResponse,
+)
 
-router = APIRouter(prefix="/hello", tags=["Hello World"])
-
-
-@router.post("/foo", response_model=BarResponse)
-def foo(request: FooRequest):
-    return BarResponse(buzz=len(request.fizz))
-
-
-# There may be more than one router to separate different parts of the API.
-# router = APIRouter(prefix="/users", tags=["User Management"])
+router = APIRouter()
 
 
-# @router.post("/foo", response_model=BarResponse)
-# def foo(request: FooRequest):
-#     return BarResponse(buzz=len(request.fizz))
+@router.post(
+    "/transactions",
+    response_model=TransactionProceedResponse,
+    tags=["PSP Core"],
+)
+def proceed_with_transaction(transaction: TransactionProceedRequest):
+    """
+    Provide handler information to proceed with the transaction and
+    receive PAYMENT_URL to redirect the customers to.
+    """
+    pass
+    # TODO: Persist that transaction in handler database
+    # Call the external service or internal method to get the next url (PAYMENT_URL)
+    # and return it to redirect the customer.
+
+
+@router.get(
+    "/schema",
+    response_model=HandlerConfigurationSchemaResponse,
+    tags=["PSP Core"],
+)
+def get_handler_configuration_schema():
+    """
+    Get information that describes the handler and how merchants
+    should configure it.
+    """
+    return HandlerConfigurationSchemaResponse(
+        title="Pay With Bitcoin",
+        configuration_schema=MerchantConfiguration.model_json_schema(),
+    )
+
+
+@router.post("/merchants", tags=["PSP Core"])
+def add_new_merchant(new_merchant: ConfigureMerchantRequest):
+    """
+    Add a new merchant to the handler and configure it.
+    """
+    # TODO: Persist the merchant configuration in the handler database
+    return {"message": "Merchant added successfully."}

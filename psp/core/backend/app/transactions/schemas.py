@@ -1,6 +1,10 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import UUID4, BaseModel, Field, HttpUrl, PositiveFloat
+
+
+class TransactionStatusUpdateRequest(BaseModel):
+    status: Literal["completed", "failed"]
 
 
 class TransactionCreateRequest(BaseModel):
