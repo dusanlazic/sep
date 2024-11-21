@@ -1,12 +1,13 @@
 from pydantic import UUID4, BaseModel, HttpUrl, PositiveFloat
 
 
-class TransactionProceedRequest(BaseModel):
-    class NextUrls(BaseModel):
-        success: HttpUrl
-        failure: HttpUrl
-        error: HttpUrl
+class NextUrls(BaseModel):
+    success: HttpUrl
+    failure: HttpUrl
+    error: HttpUrl
 
+
+class TransactionProceedRequest(BaseModel):
     id: UUID4
     merchant_id: UUID4
     amount: PositiveFloat
@@ -29,3 +30,10 @@ class MerchantConfiguration(BaseModel):
 class ConfigureMerchantRequest(BaseModel):
     merchant_id: UUID4
     configuration: MerchantConfiguration
+
+
+class TransactionDetailsResponse(BaseModel):
+    deposit_address: str
+    amount: PositiveFloat
+    urls: NextUrls
+    status: str

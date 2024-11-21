@@ -1,9 +1,12 @@
+import uuid
+
 from fastapi import APIRouter
 
 from .schemas import (
     ConfigureMerchantRequest,
     HandlerConfigurationSchemaResponse,
     MerchantConfiguration,
+    TransactionDetailsResponse,
     TransactionProceedRequest,
     TransactionProceedResponse,
 )
@@ -50,3 +53,19 @@ def add_new_merchant(new_merchant: ConfigureMerchantRequest):
     """
     # TODO: Persist the merchant configuration in the handler database
     return {"message": "Merchant added successfully."}
+
+
+@router.get(
+    "/transactions/{transaction_id}",
+    response_model=TransactionDetailsResponse,
+    tags=["Handler Frontend"],
+)
+def get_transaction(transaction_id: uuid.UUID):
+    """
+    Get information about the transaction. Used by the handler frontend to
+    display the amount and QR code to the customer, and to check the status
+    of the transaction in order to redirect the customer to the correct page.
+
+    This endpoint can be called repeatably to check the status of the transaction.
+    """
+    pass
