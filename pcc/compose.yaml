@@ -10,7 +10,7 @@ services:
   pcc-backend:
     container_name: pcc-backend
     image: fastapi-hot-reload
-    command: bash -c "uv run fastapi dev --port 9000"
+    command: bash -c "uv run fastapi dev --host 0.0.0.0 --port 9000"
     user: "${UID}:${GID}"
     volumes:
       - ./backend:/backend
