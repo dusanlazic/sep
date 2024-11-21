@@ -10,11 +10,21 @@ services:
   telecom-backend:
     container_name: telecom-backend
     image: fastapi-hot-reload
-    command: bash -c "uv run fastapi dev --host 0.0.0.0 --port 9000"
+    command: bash -c "uv run fastapi dev --host 0.0.0.0 --port 9000 --root-path /api/v1"
     user: "${UID}:${GID}"
     volumes:
       - ./backend:/backend
     working_dir: /backend
     depends_on:
       telecom-db:
+        condition: service_started
+
+  telecom-reverse-proxy:
+    container_name: telecom-reverse-proxy
+    image: nginx
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      telecom-backend:
         condition: service_started

@@ -60,7 +60,5 @@ services:
     ports:
       - 5439:5432
   telecom-backend:
-    ports:
-      - 9439:9000
     environment:
       - DATABASE_URL=postgresql+psycopg2://user:password@telecom-db/dbname

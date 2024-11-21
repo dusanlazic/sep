@@ -1,0 +1,10 @@
+[project]
+name = "get-ips"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "docker>=7.1.0",
+    "prettytable>=3.12.0",
+]
