@@ -10,11 +10,21 @@ services:
   psp-core-backend:
     container_name: psp-core-backend
     image: fastapi-hot-reload
-    command: bash -c "uv run fastapi dev --host 0.0.0.0 --port 9000"
+    command: bash -c "uv run fastapi dev --host 0.0.0.0 --port 9000 --root-path /api/v1"
     user: "${UID}:${GID}"
     volumes:
       - ./backend:/backend
     working_dir: /backend
     depends_on:
       psp-core-db:
+        condition: service_started
+
+  psp-core-reverse-proxy:
+    container_name: psp-core-reverse-proxy
+    image: nginx
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      psp-core-backend:
         condition: service_started

@@ -1,5 +1,6 @@
 FROM python:3.12-slim-bookworm
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+RUN apt update && apt install -y curl
 
 ARG GID=1000
 ARG UID=1000

@@ -21,17 +21,60 @@ def get_container_ip(client, container_name):
 
 
 if __name__ == "__main__":
-    # List of container names
-    containers = [
+    components = [
         (
             "telecom-reverse-proxy",
-            "Telecom Frontend",
-            "http://telecom-%s.nip.io",
+            "Telecom Web App",
+            "http://telecom.%s.nip.io/",
+            None,
         ),
         (
             "telecom-reverse-proxy",
             "Telecom API",
-            "http://telecom-%s.nip.io/api/v1/docs",
+            "http://api.telecom.%s.nip.io/api/v1/",
+            None,
+        ),
+        (
+            "psp-core-reverse-proxy",
+            "PSP Frontend",
+            "http://psp.%s.nip.io/",
+            None,
+        ),
+        (
+            "psp-core-reverse-proxy",
+            "PSP Public-Facing API",
+            "http://api.psp.%s.nip.io/api/v1/",
+            None,
+        ),
+        (
+            "psp-core-reverse-proxy",
+            "PSP Internal API",
+            "http://internal-api.psp.%s.nip.io/api/v1/",
+            "http://psp-core-backend:9000/",
+        ),
+        (
+            "psp-crypto-handler-reverse-proxy",
+            "PSP Crypto Payment Page",
+            "http://crypto.psp.%s.nip.io/",
+            None,
+        ),
+        (
+            "psp-crypto-handler-reverse-proxy",
+            "PSP Crypto Public-Facing API",
+            "http://crypto.psp.%s.nip.io/api/v1/",
+            None,
+        ),
+        (
+            "psp-crypto-handler-reverse-proxy",
+            "PSP Crypto Internal API",
+            "http://internal-crypto.psp.%s.nip.io/api/v1/",
+            "http://psp-crypto-handler-backend:9000/",
+        ),
+        (
+            "psp-card-handler-backend",
+            "PSP Card Internal API",
+            "http://internal-card.psp.%s.nip.io/api/v1/",
+            "http://psp-card-handler-backend:9000/",
         ),
     ]
 
@@ -40,10 +83,20 @@ if __name__ == "__main__":
     table = PrettyTable()
     table.set_style(TableStyle.SINGLE_BORDER)
     table.align = "l"
-    table.field_names = ["", "URL"]
+    table.field_names = [
+        "Component",
+        "Public URL (Avoid using if internal is provided)",
+        "Internal URL",
+    ]
 
-    for container_name, description, template in containers:
+    for container_name, name, public_url_template, internal_url in components:
         ip_address = get_container_ip(client, container_name)
-        table.add_row([description, template % ip_address])
+        table.add_row(
+            [
+                name,
+                public_url_template % ip_address,
+                internal_url or "",
+            ]
+        )
 
     print(table)
