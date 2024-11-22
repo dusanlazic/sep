@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from ..auth.dependencies import get_current_merchant_manager, is_admin
+from ..auth.dependencies import get_current_merchant_manager_id, is_admin
 from . import service
 from .schemas import (
     MerchantPaymentMethodConfigurationRequest,
@@ -40,7 +40,7 @@ def add_payment_method(new_payment_method: PaymentMethodCreateRequest):
 
 @router.get(
     "/config",
-    dependencies=[Depends(get_current_merchant_manager)],
+    dependencies=[Depends(get_current_merchant_manager_id)],
     response_model=MerchantPaymentMethodConfigurationResponse,
     tags=["Merchant Manager"],
 )
@@ -53,7 +53,7 @@ def get_merchant_payment_methods_configuration():
 
 @router.post(
     "/config",
-    dependencies=[Depends(get_current_merchant_manager)],
+    dependencies=[Depends(get_current_merchant_manager_id)],
     response_model=MerchantPaymentMethodConfigurationResponse,
     tags=["Merchant Manager"],
 )

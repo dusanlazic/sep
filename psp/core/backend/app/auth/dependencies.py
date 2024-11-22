@@ -1,10 +1,13 @@
 from typing import Annotated
 from uuid import UUID
 
+import jwt
 from fastapi import Cookie, Header, HTTPException
 
+from ..config import config
 
-def get_current_merchant_manager(
+
+def get_current_merchant_manager_id(
     access_token: Annotated[str | None, Cookie()] = None,
 ) -> UUID:
     """
@@ -16,8 +19,8 @@ def get_current_merchant_manager(
     if not access_token:
         raise HTTPException(status_code=401, detail="Access token not provided.")
 
-    # TODO: Token validation and data extraction
-    return UUID("00000000-0000-0000-0000-000000000000")
+    data = jwt.decode(access_token, config.secret_key, algorithms=["HS256"])
+    return UUID(data["sub"])
 
 
 def get_current_merchant(
