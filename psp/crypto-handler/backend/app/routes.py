@@ -1,8 +1,11 @@
 import uuid
+from urllib.parse import urlencode, urlunparse
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from .config import config
 from .database import get_db
 from .models import DepositAddress, Merchant, Transaction, TransactionStatus
 from .schemas import (
@@ -15,22 +18,6 @@ from .schemas import (
 )
 
 router = APIRouter()
-
-
-@router.post(
-    "/transactions",
-    response_model=TransactionProceedResponse,
-    tags=["PSP Core"],
-)
-def proceed_with_transaction(transaction: TransactionProceedRequest):
-    """
-    Provide handler information to proceed with the transaction and
-    receive PAYMENT_URL to redirect the customers to.
-    """
-    pass
-    # TODO: Persist that transaction in handler database
-    # Call the external service or internal method to get the next url (PAYMENT_URL)
-    # and return it to redirect the customer.
 
 
 @router.get(
@@ -76,12 +63,67 @@ def add_new_merchant(
     return {"message": "Merchant added successfully."}
 
 
+@router.post(
+    "/transactions",
+    response_model=TransactionProceedResponse,
+    tags=["PSP Core"],
+)
+def proceed_with_transaction(
+    transaction_proceed_request: TransactionProceedRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Provide handler information to proceed with the transaction and
+    receive PAYMENT_URL to redirect the customers to.
+    """
+    merchant = (
+        db.query(Merchant)
+        .filter_by(psp_id=transaction_proceed_request.merchant_id)
+        .first()
+    )
+
+    free_deposit_address = (
+        db.query(DepositAddress).filter_by(used=False, merchant_id=merchant.id).first()
+    )
+
+    new_transaction = Transaction(
+        psp_id=transaction_proceed_request.id,
+        merchant_id=transaction_proceed_request.merchant_id,
+        deposit_address_id=free_deposit_address.id,
+        amount=transaction_proceed_request.amount,
+        status=TransactionStatus.PENDING,
+        success_url=transaction_proceed_request.next_urls.success.unicode_string(),
+        failure_url=transaction_proceed_request.next_urls.failure.unicode_string(),
+        error_url=transaction_proceed_request.next_urls.error.unicode_string(),
+    )
+    try:
+        db.add(new_transaction)
+        free_deposit_address.used = True
+        db.flush()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=409, detail="Transaction already exists.")
+
+    payment_url = urlunparse(
+        (
+            "http",
+            config.frontend_host,
+            "/payment",
+            "",
+            urlencode({"id": new_transaction.id}),
+            "",
+        )
+    )
+
+    return TransactionProceedResponse(payment_url=payment_url)
+
+
 @router.get(
     "/transactions/{transaction_id}",
     response_model=TransactionDetailsResponse,
     tags=["Handler Frontend"],
 )
-def get_transaction(transaction_id: uuid.UUID):
+def get_transaction(transaction_id: uuid.UUID, db: Session = Depends(get_db)):
     """
     Get information about the transaction. Used by the handler frontend to
     display the amount and QR code to the customer, and to check the status
@@ -89,4 +131,17 @@ def get_transaction(transaction_id: uuid.UUID):
 
     This endpoint can be called repeatably to check the status of the transaction.
     """
-    pass
+    transaction = db.query(Transaction).filter_by(id=transaction_id).first()
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found.")
+
+    return TransactionDetailsResponse(
+        deposit_address=transaction.deposit_address.address,
+        amount=transaction.amount,
+        urls={
+            "success": transaction.success_url,
+            "failure": transaction.failure_url,
+            "error": transaction.error_url,
+        },
+        status=transaction.status.value,
+    )

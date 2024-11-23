@@ -33,7 +33,7 @@ def register_merchant(
             configuration_json={
                 "urls": {
                     "success": new_merchant.payment_success_url.unicode_string(),
-                    "fail": new_merchant.payment_failure_url.unicode_string(),
+                    "failure": new_merchant.payment_failure_url.unicode_string(),
                     "error": new_merchant.payment_error_url.unicode_string(),
                     "callback": new_merchant.payment_callback_url.unicode_string(),
                 },

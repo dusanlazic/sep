@@ -7,4 +7,5 @@ docker build -t fastapi-hot-reload \
 UID=$(id -u) GID=$(id -g) docker compose build
 UID=$(id -u) GID=$(id -g) docker compose up -d
 
+uv --directory devops/update-hosts run main.py
 uv --directory devops/get-ips run main.py

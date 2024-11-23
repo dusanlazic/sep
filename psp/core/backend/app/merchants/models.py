@@ -47,7 +47,7 @@ class Merchant(Base):
                     OrderedDict(
                         [
                             ("success", jsonb_data["urls"]["success"]),
-                            ("fail", jsonb_data["urls"]["fail"]),
+                            ("failure", jsonb_data["urls"]["failure"]),
                             ("error", jsonb_data["urls"]["error"]),
                             ("callback", jsonb_data["urls"]["callback"]),
                         ]
