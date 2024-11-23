@@ -18,22 +18,29 @@ def get_offers(db: Session) -> list[Offer]:
     offers = db.query(Offer).all()
     return offers
 
+
 def get_subscriptions(db: Session, user_id: UUID) -> list[Subscription]:
     user = db.query(User).filter(User.id == user_id).first()
     return user.subscriptions
 
-def subscribe_to_offer(db: Session, subscription_request: SubscriptionRequest,  user_id: UUID) -> list[Subscription]:
+
+def subscribe_to_offer(
+    db: Session, subscription_request: SubscriptionRequest, user_id: UUID
+) -> list[Subscription]:
     active_subscription = (
         db.query(Subscription)
         .filter(
             Subscription.user_id == user_id,
-            Subscription.end_date > datetime.now(), 
+            Subscription.end_date > datetime.now(),
         )
         .first()
     )
 
     if active_subscription:
-        raise HTTPException(status_code=400, detail="User already has an active subscription for this offer.")
+        raise HTTPException(
+            status_code=400,
+            detail="User already has an active subscription for this offer.",
+        )
 
     start_date = datetime.now()
     end_date = start_date + timedelta(days=subscription_request.duration_in_years * 365)
@@ -55,7 +62,9 @@ def subscribe_to_offer(db: Session, subscription_request: SubscriptionRequest,  
 
     try:
         response = requests.post(
-            f"{config.psp_api_base_url}/transactions", json=transaction_payload
+            f"{config.psp_api_base_url}/transactions",
+            json=transaction_payload,
+            headers={"X-API-Key": config.psp_api_key},
         )
 
         if response.status_code != 200:

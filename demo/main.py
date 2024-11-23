@@ -14,10 +14,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Copy this from run.py output
-TELECOM_WEB_APP = "http://telecom.172.19.0.20.nip.io/"
-TELECOM_API = "http://api.telecom.172.19.0.20.nip.io/api/v1/"
-PSP_FRONTEND = "http://psp.172.19.0.19.nip.io/"
-PSP_PUBLIC_FACING_API = "http://api.psp.172.19.0.19.nip.io/api/v1/"
+TELECOM_FRONTEND = "http://telecom.172.19.0.19.nip.io/"
+TELECOM_API = "http://api.telecom.172.19.0.19.nip.io/api/v1/"
+PSP_FRONTEND = "http://psp.172.19.0.20.nip.io/"
+PSP_PUBLIC_FACING_API = "http://api.psp.172.19.0.20.nip.io/api/v1/"
 PSP_INTERNAL_API = "http://psp-core-backend:9000/"
 PSP_CRYPTO_PAYMENT_PAGE = "http://crypto.psp.172.19.0.18.nip.io/"
 PSP_CRYPTO_PUBLIC_FACING_API = "http://crypto.psp.172.19.0.18.nip.io/api/v1/"
@@ -77,7 +77,7 @@ def merchant_get_own_config(token: str):
 def merchant_set_own_api_key(token: str):
     logger.info("Setting own API key...")
 
-    env_file = "../telecom/backend/.env.example"
+    env_file = "../telecom/backend/.env"
 
     response = requests.get(
         PSP_PUBLIC_FACING_API + "merchants/me",
@@ -237,6 +237,7 @@ if __name__ == "__main__":
     merchant_get_own_config(token)
 
     # replace this with the customer that initiates transaction on merchant app
+    exit()
     transaction_id = merchant_app_initiate_transaction(api_key)
 
     customer_gets_transaction_information(transaction_id)
