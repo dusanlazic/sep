@@ -24,9 +24,26 @@ export const useSubscriptionStore = defineStore('subscriptions', () => {
     }
   };
 
+  async function subscribeToOffer(data) {
+    try {
+      const response = await ax.post(
+        '/offers/subscriptions',
+        data,
+      );
+      const subscriptionResponse = response.data;
+      
+      console.log('SUB', subscriptionResponse);
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
+
   function clearOffers() {
     offers.value = [];
   };
 
-  return { offers, fetchOffers, clearOffers };
+  return { offers, fetchOffers, clearOffers, subscribeToOffer };
 });
