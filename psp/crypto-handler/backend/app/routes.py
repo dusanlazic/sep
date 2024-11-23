@@ -80,7 +80,7 @@ def proceed_with_transaction(
     """
     merchant = (
         db.query(Merchant)
-        .filter_by(psp_id=transaction_proceed_request.merchant_id)
+        .filter_by(psp_id=str(transaction_proceed_request.merchant_id))
         .first()
     )
 
@@ -90,7 +90,7 @@ def proceed_with_transaction(
 
     new_transaction = Transaction(
         psp_id=transaction_proceed_request.id,
-        merchant_id=transaction_proceed_request.merchant_id,
+        merchant_id=merchant.id,
         deposit_address_id=free_deposit_address.id,
         amount=transaction_proceed_request.amount,
         status=TransactionStatus.PENDING,
@@ -102,9 +102,12 @@ def proceed_with_transaction(
         db.add(new_transaction)
         free_deposit_address.used = True
         db.flush()
-    except IntegrityError:
+    except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=409, detail="Transaction already exists.")
+        raise HTTPException(
+            status_code=500,
+            detail="There was an error when creating the transaction: " + str(e),
+        )
 
     payment_url = urlunparse(
         (

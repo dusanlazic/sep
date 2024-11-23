@@ -79,13 +79,18 @@ def get_transaction(
     response_model=TransactionProceedResponse,
     tags=["Customer"],
 )
-def proceed_to_payment(transaction_id: str, proceed_request: TransactionProceedRequest):
+def proceed_to_payment(
+    transaction_id: UUID,
+    proceed_request: TransactionProceedRequest,
+    db: Session = Depends(get_db),
+):
     """
     Request to proceed with the transaction using the selected payment method.
     """
-    pass
-    # TODO: PSP Core calls the selected handler to proceed with the transaction.
-    # The handler returns the payment URL to redirect the customer to, to complete the payment.
+    payment_url = service.get_payment_url(
+        db, transaction_id, proceed_request.payment_method_name
+    )
+    return TransactionProceedResponse(payment_url=payment_url)
 
 
 @router.put(
@@ -93,11 +98,12 @@ def proceed_to_payment(transaction_id: str, proceed_request: TransactionProceedR
     tags=["Handler"],
 )
 def update_transaction_status(
-    transaction_id: str, status: TransactionStatusUpdateRequest
+    transaction_id: UUID,
+    status: TransactionStatusUpdateRequest,
+    db: Session = Depends(get_db),
 ):
     """
     Update the transaction status after the payment has been processed by the handler.
     """
-    pass
-    # TODO: PSP Core updates the transaction status in the database and calls the merchant's callback URL
-    # to propagate the change.
+    service.update_transaction_status(db, transaction_id, status.status)
+    return {"detail": "Status update instruction received."}

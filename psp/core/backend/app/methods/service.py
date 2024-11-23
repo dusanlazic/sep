@@ -24,7 +24,7 @@ def apply_merchant_payment_methods_configuration(
     db: Session,
     config_yaml: str,
     current_user_id: UUID,
-) -> None:
+) -> tuple[dict, str]:
     try:
         new_config: dict = yaml.safe_load(config_yaml)
     except yaml.YAMLError as e:
@@ -67,7 +67,7 @@ def apply_merchant_payment_methods_configuration(
     merchant.configuration_json = new_config
     db.commit()
 
-    return merchant.configuration_json
+    return merchant.configuration_json, merchant.get_configuration_yaml()
 
 
 def get_payment_methods(db: Session) -> list[PaymentMethod]:

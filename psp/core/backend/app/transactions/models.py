@@ -31,10 +31,12 @@ class Transaction(Base):
         Merchant,
         foreign_keys=[merchant_id],
     )
-    amount = mapped_column(Float, nullable=False)
-    status = mapped_column(Enum(TransactionStatus, native_enum=True), nullable=False)
-    subject = mapped_column(String, nullable=False)
-    description = mapped_column(String, nullable=False)
+    amount: Mapped[int] = mapped_column(Float, nullable=False)
+    status: Mapped[TransactionStatus] = mapped_column(
+        Enum(TransactionStatus, native_enum=True), nullable=False
+    )
+    subject: Mapped[str] = mapped_column(String, nullable=False)
+    description: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,

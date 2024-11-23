@@ -1,4 +1,5 @@
 from urllib.parse import urlparse
+from rich import print_json
 import requests
 import logging
 import sys
@@ -38,7 +39,7 @@ def register_merchant(username: str):
     }
 
     response = requests.post(PSP_PUBLIC_FACING_API + "merchants/register", json=payload)
-    logger.info(response.text)
+    print_json(data=response.json())
 
 
 def login_merchant(username: str) -> str:
@@ -48,7 +49,7 @@ def login_merchant(username: str) -> str:
 
     response = requests.post(PSP_PUBLIC_FACING_API + "merchants/login", json=payload)
 
-    logger.info(response.text)
+    print_json(data=response.json())
 
     access_token = response.cookies["access_token"]
 
@@ -57,7 +58,7 @@ def login_merchant(username: str) -> str:
         cookies={"access_token": access_token},
     )
 
-    logger.info(response.text)
+    print_json(data=response.json())
     return access_token
 
 
@@ -69,7 +70,8 @@ def merchant_get_own_config(token: str):
         cookies={"access_token": token},
     )
 
-    logger.info("\n" + response.json()["yaml"])
+    print_json(data=response.json())
+    print("\n" + response.json()["yaml"])
 
 
 def merchant_set_own_api_key(token: str):
@@ -109,7 +111,7 @@ def admin_list_payment_methods():
         PSP_PUBLIC_FACING_API + "payment-methods",
         cookies={"access_token": "hey_its_admin"},
     )
-    logger.info(response.json())
+    print_json(data=response.json())
 
 
 def admin_add_payment_method_bitcoin():
@@ -129,7 +131,7 @@ def admin_add_payment_method_bitcoin():
         cookies={"access_token": "hey_its_admin"},
     )
 
-    logger.info(response.text)
+    print_json(data=response.json())
 
 
 def merchant_update_own_config(token: str):
@@ -167,10 +169,10 @@ payment_methods:
         cookies={"access_token": token},
     )
 
-    logger.info(response.text)
+    print_json(data=response.json())
 
 
-def merchant_app_initiate_transaction(api_key: str):
+def merchant_app_initiate_transaction(api_key: str) -> str:
     logger.info("Initiating transaction...")
 
     payload = {
@@ -185,7 +187,39 @@ def merchant_app_initiate_transaction(api_key: str):
         headers={"X-API-Key": api_key},
     )
 
-    logger.info(response.text)
+    print_json(data=response.json())
+
+    return response.json()["transaction_id"]
+
+
+def customer_gets_transaction_information(transaction_id: str):
+    logger.info("Getting transaction information...")
+    response = requests.get(PSP_PUBLIC_FACING_API + f"transactions/{transaction_id}")
+    print_json(data=response.json())
+
+
+def customer_proceeds_with_transaction(transaction_id: str, payment_method: str) -> str:
+    logger.info("Proceeding with transaction...")
+
+    payload = {"payment_method_name": payment_method}
+
+    response = requests.post(
+        PSP_PUBLIC_FACING_API + f"transactions/{transaction_id}/proceed",
+        json=payload,
+    )
+
+    print_json(data=response.json())
+    return response.json()["payment_url"]
+
+
+def customer_gets_transaction_information_from_bitcoin_handler(transaction_id: str):
+    logger.info("Getting transaction information from bitcoin handler API...")
+
+    response = requests.get(
+        PSP_CRYPTO_PUBLIC_FACING_API + f"transactions/{transaction_id}"
+    )
+
+    print_json(data=response.json())
 
 
 if __name__ == "__main__":
@@ -202,4 +236,11 @@ if __name__ == "__main__":
     merchant_update_own_config(token)
     merchant_get_own_config(token)
 
-    merchant_app_initiate_transaction(api_key)
+    # replace this with the customer that initiates transaction on merchant app
+    transaction_id = merchant_app_initiate_transaction(api_key)
+
+    customer_gets_transaction_information(transaction_id)
+    bitcoin_payment_url = customer_proceeds_with_transaction(transaction_id, "bitcoin")
+    bitcoin_transaction_id = bitcoin_payment_url.split("=")[-1]
+
+    customer_gets_transaction_information_from_bitcoin_handler(bitcoin_transaction_id)
