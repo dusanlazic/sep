@@ -1,6 +1,8 @@
+from urllib.parse import urlparse
 import requests
 import logging
 import sys
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -10,13 +12,15 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-TELECOM_API = "http://api.telecom.172.19.0.20.nip.io/api/v1/"
-PSP_CORE_PUBLIC_FACING_API = "http://api.psp.172.19.0.18.nip.io/api/v1/"
-PSP_CRYPTO_PUBLIC_FACING_API = "http://crypto.psp.172.19.0.19.nip.io/api/v1/"
-PSP_CARD_PUBLIC_FACING_API = "http://card.psp.172.19.0.12.nip.io/api/v1/"
-
-PSP_CRYPTO_INTERNAL_HOST = "psp-crypto-handler-backend"
-PSP_CRYPTO_INTERNAL_PORT = 9000
+TELECOM_WEB_APP = "http://telecom.172.19.0.10.nip.io/"
+TELECOM_API = "http://api.telecom.172.19.0.10.nip.io/api/v1/"
+PSP_FRONTEND = "http://psp.172.19.0.10.nip.io/"
+PSP_PUBLIC_FACING_API = "http://api.psp.172.19.0.10.nip.io/api/v1/"
+PSP_INTERNAL_API = "http://psp-core-backend:9000/"
+PSP_CRYPTO_PAYMENT_PAGE = "http://crypto.psp.172.19.0.10.nip.io/"
+PSP_CRYPTO_PUBLIC_FACING_API = "http://crypto.psp.172.19.0.10.nip.io/api/v1/"
+PSP_CRYPTO_INTERNAL_API = "http://psp-crypto-handler-backend:9000/"
+PSP_CARD_INTERNAL_API = "http://psp-card-handler-backend:9000/"
 
 
 def register_merchant(username: str):
@@ -32,9 +36,7 @@ def register_merchant(username: str):
         "payment_callback_url": "https://example.com/callback",
     }
 
-    response = requests.post(
-        PSP_CORE_PUBLIC_FACING_API + "merchants/register", json=payload
-    )
+    response = requests.post(PSP_PUBLIC_FACING_API + "merchants/register", json=payload)
     logger.info(response.text)
 
 
@@ -43,16 +45,14 @@ def login_merchant(username: str) -> str:
 
     payload = {"username": username, "password": "securepassword123"}
 
-    response = requests.post(
-        PSP_CORE_PUBLIC_FACING_API + "merchants/login", json=payload
-    )
+    response = requests.post(PSP_PUBLIC_FACING_API + "merchants/login", json=payload)
 
     logger.info(response.text)
 
     access_token = response.cookies["access_token"]
 
     response = requests.get(
-        PSP_CORE_PUBLIC_FACING_API + "merchants/me",
+        PSP_PUBLIC_FACING_API + "merchants/me",
         cookies={"access_token": access_token},
     )
 
@@ -64,7 +64,7 @@ def merchant_get_own_config(token: str):
     logger.info("Getting own configuration...")
 
     response = requests.get(
-        PSP_CORE_PUBLIC_FACING_API + "payment-methods/config",
+        PSP_PUBLIC_FACING_API + "payment-methods/config",
         cookies={"access_token": token},
     )
 
@@ -75,7 +75,7 @@ def admin_list_payment_methods():
     logger.info("Listing payment methods...")
 
     response = requests.get(
-        PSP_CORE_PUBLIC_FACING_API + "payment-methods",
+        PSP_PUBLIC_FACING_API + "payment-methods",
         cookies={"access_token": "hey_its_admin"},
     )
     logger.info(response.json())
@@ -84,14 +84,16 @@ def admin_list_payment_methods():
 def admin_add_payment_method_bitcoin():
     logger.info("Adding bitcoin payment method...")
 
+    parsed_url = urlparse(PSP_CRYPTO_INTERNAL_API)
+
     payload = {
-        "host": PSP_CRYPTO_INTERNAL_HOST,
-        "port": PSP_CRYPTO_INTERNAL_PORT,
+        "host": parsed_url.hostname,
+        "port": parsed_url.port,
         "name": "bitcoin",
     }
 
     response = requests.post(
-        PSP_CORE_PUBLIC_FACING_API + "payment-methods",
+        PSP_PUBLIC_FACING_API + "payment-methods",
         json=payload,
         cookies={"access_token": "hey_its_admin"},
     )
@@ -122,7 +124,7 @@ payment_methods:
     payload = {"yaml": yaml}
 
     response = requests.post(
-        PSP_CORE_PUBLIC_FACING_API + "payment-methods/config",
+        PSP_PUBLIC_FACING_API + "payment-methods/config",
         json=payload,
         cookies={"access_token": token},
     )

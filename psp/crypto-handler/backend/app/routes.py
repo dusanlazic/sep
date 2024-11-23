@@ -1,7 +1,10 @@
 import uuid
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 
+from .database import get_db
+from .models import DepositAddress, Merchant, Transaction, TransactionStatus
 from .schemas import (
     ConfigureMerchantRequest,
     HandlerConfigurationSchemaResponse,
@@ -47,11 +50,29 @@ def get_handler_configuration_schema():
 
 
 @router.post("/merchants", tags=["PSP Core"])
-def add_new_merchant(new_merchant: ConfigureMerchantRequest):
+def add_new_merchant(
+    merchant_create_request: ConfigureMerchantRequest,
+    db: Session = Depends(get_db),
+):
     """
     Add a new merchant to the handler and configure it.
     """
-    # TODO: Persist the merchant configuration in the handler database
+    merchant = (
+        db.query(Merchant).filter_by(psp_id=merchant_create_request.merchant_id).first()
+    )
+    if merchant:
+        raise HTTPException(status_code=409, detail="Merchant already exists.")
+
+    new_merchant = Merchant(
+        psp_id=merchant_create_request.merchant_id,
+        deposit_addresses=[
+            DepositAddress(address=address)
+            for address in merchant_create_request.configuration.deposit_addresses
+        ],
+    )
+    db.add(new_merchant)
+    db.commit()
+
     return {"message": "Merchant added successfully."}
 
 

@@ -16,6 +16,12 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Telecom Backend", lifespan=lifespan)
 
+
+@app.get("/health", summary="Health Check")
+def health_check():
+    return {"status": "ok"}
+
+
 for router in [
     auth_router,
     offers_router,

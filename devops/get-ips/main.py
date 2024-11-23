@@ -100,3 +100,13 @@ if __name__ == "__main__":
         )
 
     print(table)
+
+    for _, name, public_url_template, internal_url in components:
+        ip_address = get_container_ip(client, container_name)
+        print(
+            name.upper().replace("-", "_").replace(" ", "_"),
+            "=",
+            '"'
+            + (internal_url if internal_url else public_url_template % ip_address)
+            + '"',
+        )
