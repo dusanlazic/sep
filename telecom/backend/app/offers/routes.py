@@ -38,11 +38,12 @@ def get_subscriptions(
 
 @router.post("/subscriptions", response_model=PaymentInitiatedResponse)
 def subscribe_to_offer(
+    db: Annotated[Session, Depends(get_db)],
     subscription_request: SubscriptionRequest,
     current_user_id: UUID = Depends(get_current_user),
 ) -> PaymentInitiatedResponse:
     """
     Subscribe to an offer.
     """
-    # TODO: Check if user has an active subscription
-    return PaymentInitiatedResponse(payment_url="http://psp.local/order/123")
+    return service.subscribe_to_offer(db, subscription_request, current_user_id)
+    

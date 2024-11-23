@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import Offer from '../components/services/Offer.vue';
 import { useSubscriptionStore } from '@/stores/subscription.store';
 import { onBeforeMount } from 'vue';
@@ -8,7 +8,7 @@ const subsciptionStore = useSubscriptionStore();
 
 const offers = ref([]);
 const selectedOffer = ref(null);
-const subscriptionDuration = ref(1); // Default to 1 year
+const subscriptionDuration = ref(1);
 const autoRenew = ref(false);
 
 onBeforeMount(async () => {
@@ -27,6 +27,13 @@ const handlePlaceOrder = () => {
   console.log(
     `Subscribe: ${selectedOffer.value.identifier}, Duration: ${subscriptionDuration.value} year(s), Auto-renew: ${autoRenew.value}`
   );
+
+  subsciptionStore.subscribeToOffer({
+    offer_identifier: selectedOffer.value.identifier,
+    duration_in_years: subscriptionDuration.value,
+    auto_renew: autoRenew.value,
+  })
+
 };
 
 const handleDurationChange = (duration) => {
