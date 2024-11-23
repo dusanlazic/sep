@@ -66,7 +66,7 @@ def subscribe_to_offer(db: Session, subscription_request: SubscriptionRequest,  
 
     payment_data = response.json()
     payment_url = payment_data.get("proceed_url")
-    psp_order_id = payment_data.get("id")
+    psp_order_id = payment_data.get("transaction_id")
 
     if not payment_url or not psp_order_id:
         raise HTTPException(status_code=500, detail="Failed to initialise payment.")
