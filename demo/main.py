@@ -1,3 +1,4 @@
+from pathlib import Path
 from urllib.parse import urlparse
 from rich import print_json
 import requests
@@ -100,6 +101,8 @@ def merchant_set_own_api_key(token: str):
 
         if not updated:
             file.write(f"PSP_API_KEY={api_key}\n")
+
+    Path("../telecom/backend/app/main.py").touch()
 
     return api_key
 

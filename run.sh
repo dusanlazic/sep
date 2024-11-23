@@ -13,8 +13,9 @@ UID=$(id -u) GID=$(id -g) docker compose up -d
 uv --directory devops/update-env run main.py
 
 # Rerun backends to apply new environment variables
-UID=$(id -u) GID=$(id -g) docker compose stop -t 0 telecom-backend psp-core-backend psp-crypto-handler-backend
-UID=$(id -u) GID=$(id -g) docker compose up -d
+touch telecom/backend/app/main.py
+touch psp/core/backend/app/main.py
+touch psp/crypto-handler/backend/app/main.py
 
 # Build frontends with updated environment variables
 npm install --prefix telecom/frontend
