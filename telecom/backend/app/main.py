@@ -7,12 +7,14 @@ from .auth.routes import router as auth_router
 from .config import config
 from .database import create_tables
 from .offers.routes import router as offers_router
+from .populate import create_offers
 from .transactions.routes import router as transactions_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_tables()
+    create_offers()
     yield
 
 
