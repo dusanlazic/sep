@@ -37,10 +37,16 @@ def subscribe_to_offer(
     )
 
     if active_subscription:
-        raise HTTPException(
-            status_code=400,
-            detail="User already has an active subscription for this offer.",
+        subscription_transaction = (
+            db.query(Transaction)
+            .filter(
+                Transaction.subscription_id == active_subscription.id,
+                Transaction.status in (TransactionStatus.PENDING, TransactionStatus.COMPLETED),
+            )
+            .first()
         )
+        if subscription_transaction:
+            raise HTTPException(status_code=400, detail="User already has an active or pending subscription.")
 
     start_date = datetime.now()
     end_date = start_date + timedelta(days=subscription_request.duration_in_years * 365)

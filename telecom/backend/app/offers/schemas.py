@@ -26,6 +26,7 @@ class SubscriptionResponse(BaseModel):
     title: str = Field(alias=AliasPath("offer", "title"))
     description: str = Field(alias=AliasPath("offer", "description"))
     price: PositiveFloat = Field(alias=AliasPath("offer", "price"))
+    duration_in_years: PositiveInt
     start_date: AwareDatetime
     end_date: AwareDatetime
     auto_renew: bool
