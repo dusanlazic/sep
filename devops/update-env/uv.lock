@@ -119,7 +119,7 @@ wheels = [
 ]
 
 [[package]]
-name = "update-hosts"
+name = "update-env"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

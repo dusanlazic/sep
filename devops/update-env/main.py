@@ -1,4 +1,6 @@
+import os
 import docker
+import shutil
 
 
 def get_container_ip(client, container_name):
@@ -23,6 +25,12 @@ def update_env_file(ip_address, template, variable, env_file):
     new_value = template % ip_address
 
     try:
+        if not os.path.exists(env_file):
+            shutil.copy(
+                env_file.replace(".env", ".env.example"),
+                env_file,
+            )
+
         with open(env_file, "r") as file:
             lines = file.readlines()
 
@@ -52,20 +60,32 @@ if __name__ == "__main__":
         (
             "psp-crypto-handler-reverse-proxy",
             "crypto.psp.%s.nip.io",
-            "../../psp/crypto-handler/backend/.env.example",
+            "../../psp/crypto-handler/backend/.env",
             "FRONTEND_HOST",
         ),
         (
             "psp-core-reverse-proxy",
             "psp.%s.nip.io",
-            "../../psp/core/backend/.env.example",
+            "../../psp/core/backend/.env",
             "FRONTEND_HOST",
         ),
         (
             "psp-core-reverse-proxy",
             "http://psp.%s.nip.io/api/v1",
-            "../../telecom/backend/.env.example",
+            "../../telecom/backend/.env",
             "PSP_API_BASE_URL",
+        ),
+        (
+            "telecom-reverse-proxy",
+            "http://telecom.%s.nip.io",
+            "../../telecom/backend/.env",
+            "FRONTEND_ORIGIN",
+        ),
+        (
+            "telecom-reverse-proxy",
+            "http://api.telecom.%s.nip.io/api/v1/",
+            "../../telecom/frontend/.env",
+            "VITE_SERVER_URL",
         ),
     ]
 

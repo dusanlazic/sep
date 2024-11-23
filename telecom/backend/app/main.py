@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .auth.routes import router as auth_router
+from .config import config
 from .database import create_tables
 from .offers.routes import router as offers_router
 from .transactions.routes import router as transactions_router
@@ -17,13 +18,15 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Telecom Backend", lifespan=lifespan)
 
+
 @app.get("/health", summary="Health Check")
 def health_check():
     return {"status": "ok"}
 
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[config.frontend_origin, "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
