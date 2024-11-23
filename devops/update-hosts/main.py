@@ -61,6 +61,12 @@ if __name__ == "__main__":
             "../../psp/core/backend/.env.example",
             "FRONTEND_HOST",
         ),
+        (
+            "psp-core-reverse-proxy",
+            "http://psp.%s.nip.io/api/v1",
+            "../../telecom/backend/.env.example",
+            "PSP_API_BASE_URL",
+        ),
     ]
 
     for container_name, template, env_file, variable in files:

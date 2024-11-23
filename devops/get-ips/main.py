@@ -24,7 +24,7 @@ if __name__ == "__main__":
     components = [
         (
             "telecom-reverse-proxy",
-            "Telecom Web App",
+            "Telecom Frontend",
             "http://telecom.%s.nip.io/",
             None,
         ),
