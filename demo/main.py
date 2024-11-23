@@ -15,11 +15,11 @@ logger = logging.getLogger(__name__)
 # Copy this from run.py output
 TELECOM_WEB_APP = "http://telecom.172.19.0.20.nip.io/"
 TELECOM_API = "http://api.telecom.172.19.0.20.nip.io/api/v1/"
-PSP_FRONTEND = "http://psp.172.19.0.18.nip.io/"
-PSP_PUBLIC_FACING_API = "http://api.psp.172.19.0.18.nip.io/api/v1/"
+PSP_FRONTEND = "http://psp.172.19.0.19.nip.io/"
+PSP_PUBLIC_FACING_API = "http://api.psp.172.19.0.19.nip.io/api/v1/"
 PSP_INTERNAL_API = "http://psp-core-backend:9000/"
-PSP_CRYPTO_PAYMENT_PAGE = "http://crypto.psp.172.19.0.19.nip.io/"
-PSP_CRYPTO_PUBLIC_FACING_API = "http://crypto.psp.172.19.0.19.nip.io/api/v1/"
+PSP_CRYPTO_PAYMENT_PAGE = "http://crypto.psp.172.19.0.18.nip.io/"
+PSP_CRYPTO_PUBLIC_FACING_API = "http://crypto.psp.172.19.0.18.nip.io/api/v1/"
 PSP_CRYPTO_INTERNAL_API = "http://psp-crypto-handler-backend:9000/"
 PSP_CARD_INTERNAL_API = "http://psp-card-handler-backend:9000/"
 
@@ -72,6 +72,36 @@ def merchant_get_own_config(token: str):
     logger.info("\n" + response.json()["yaml"])
 
 
+def merchant_set_own_api_key(token: str):
+    logger.info("Setting own API key...")
+
+    env_file = "../telecom/backend/.env.example"
+
+    response = requests.get(
+        PSP_PUBLIC_FACING_API + "merchants/me",
+        cookies={"access_token": token},
+    )
+
+    api_key: str = response.json()["api_key"]
+
+    with open(env_file, "r") as file:
+        lines = file.readlines()
+
+    updated = False
+    with open(env_file, "w") as file:
+        for line in lines:
+            if line.startswith("PSP_API_KEY="):
+                file.write(f"PSP_API_KEY={api_key}\n")
+                updated = True
+            else:
+                file.write(line)
+
+        if not updated:
+            file.write(f"PSP_API_KEY={api_key}\n")
+
+    return api_key
+
+
 def admin_list_payment_methods():
     logger.info("Listing payment methods...")
 
@@ -99,7 +129,7 @@ def admin_add_payment_method_bitcoin():
         cookies={"access_token": "hey_its_admin"},
     )
 
-    logger.info(response.json())
+    logger.info(response.text)
 
 
 def merchant_update_own_config(token: str):
@@ -127,25 +157,6 @@ payment_methods:
           - "1P5ZEDWTKTFGxQjZphgWPQUpe554WKDfHQ"
           - "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkf"
           - "34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo"
-          - "1L8meBQvKaGWZAHYMYDbrsWN2KpKh9dmxE"
-          - "1KoZ4BZmzFdW89p7A6EfCX8pSYH4mgSWWv"
-          - "bc1qaaygfhkrlwyzhgr68c25mr7nwyl9sw8"
-          - "3Cbq7aT1tY8kMxWLbitaG7yT6bPbKChq64"
-          - "3MynU1hEoA4VXtPofMzFR9GxVFTpPa2GLo"
-          - "1Afmr1cZ7cVCPLxYGFboE4xUyThExZBYXG"
-          - "bc1qypd9hf7dj7zhzksjfyc0gkqzue5wfqy"
-          - "1BKcCHpkMi6PF9V62FbA2J4poCNnJHgr3Y"
-          - "3HKNt5aq7Gdeiqm12m1hRGqsddEtk4HrMt"
-          - "1Fd3Aj9T3tbZZphUtebcKCB3X9VJVQTe6j"
-          - "1LQPoG4yS9QymXBc89zkgy5KDRpTfY7G5L"
-          - "3QJmnhTMuGV3yy2vRGVmXMQmo1GhaPNXLy"
-          - "1F1miYFQWTzdLiCBxtHHnHozP7ziv45C2z"
-          - "bc1qvq3vsnvw4k62r7hhg9w9p5x6vxru9cc"
-          - "1Nd5XSGGhZtmdF1wgFoPNw2ch8YH1ddPQS"
-          - "3JAGAYSkKKMVexYTGv43zTAXRxF1GvSMq3"
-          - "1PZDkbU5Yok6cEKGn57Q4BniDfYHPscDeT"
-          - "1Hg2PmP1L6PLxn4mPQrfX1EQPBvAoUPZKn"
-          - "3LXY1cS3L6VxTYzPQbvRpoQvYE5KNzP4Mw"
 """
 
     payload = {"yaml": yaml}
@@ -159,13 +170,36 @@ payment_methods:
     logger.info(response.text)
 
 
+def merchant_app_initiate_transaction(api_key: str):
+    logger.info("Initiating transaction...")
+
+    payload = {
+        "amount": 10.0,
+        "subject": "Payment for service",
+        "description": "Payment for service A B C",
+    }
+
+    response = requests.post(
+        PSP_PUBLIC_FACING_API + "transactions",
+        json=payload,
+        headers={"X-API-Key": api_key},
+    )
+
+    logger.info(response.text)
+
+
 if __name__ == "__main__":
     merchant_username = "merchant5"
 
     register_merchant(merchant_username)
     token = login_merchant(merchant_username)
     merchant_get_own_config(token)
+    api_key = merchant_set_own_api_key(token)
+
     admin_list_payment_methods()
     admin_add_payment_method_bitcoin()
+
     merchant_update_own_config(token)
     merchant_get_own_config(token)
+
+    merchant_app_initiate_transaction(api_key)

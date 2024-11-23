@@ -74,3 +74,10 @@ def get_merchant_by_id(db: Session, merchant_id: str) -> Merchant:
     Retrieves the merchant by ID.
     """
     return db.query(Merchant).get(merchant_id)
+
+
+def get_merchant_by_api_key(db: Session, api_key: str) -> Merchant:
+    """
+    Retrieves the merchant by API key.
+    """
+    return db.query(Merchant).filter(Merchant.api_key == api_key).first()

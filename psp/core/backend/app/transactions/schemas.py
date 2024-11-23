@@ -1,6 +1,6 @@
 from typing import Annotated, Literal
 
-from pydantic import UUID4, BaseModel, Field, HttpUrl, PositiveFloat
+from pydantic import UUID4, BaseModel, ConfigDict, Field, HttpUrl, PositiveFloat
 
 
 class TransactionStatusUpdateRequest(BaseModel):
@@ -14,11 +14,7 @@ class TransactionCreateRequest(BaseModel):
 
 
 class TransactionCreateResponse(BaseModel):
-    id: UUID4
-    amount: PositiveFloat
-    subject: str
-    description: str
-    payment_methods: list[str]
+    transaction_id: UUID4
     proceed_url: HttpUrl = Field(
         examples=["http://frontend.psp.local/transactions/{uuid}"]
     )
@@ -26,6 +22,14 @@ class TransactionCreateResponse(BaseModel):
 
 class TransactionProceedRequest(BaseModel):
     payment_method_name: str
+
+
+class TransactionDetailsResponse(BaseModel):
+    id: UUID4
+    amount: PositiveFloat
+    subject: str
+    description: str
+    payment_methods: list[str]
 
 
 class TransactionProceedResponse(BaseModel):

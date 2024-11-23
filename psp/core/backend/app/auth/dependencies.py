@@ -2,9 +2,13 @@ from typing import Annotated
 from uuid import UUID
 
 import jwt
-from fastapi import Cookie, Header, HTTPException
+from fastapi import Cookie, Depends, Header, HTTPException
+from sqlalchemy.orm import Session
 
 from ..config import config
+from ..database import get_db
+from ..merchants import service as merchant_service
+from ..merchants.models import Merchant
 
 
 def get_current_merchant_manager_id(
@@ -29,7 +33,8 @@ def get_current_merchant_manager_id(
 
 def get_current_merchant(
     api_key: Annotated[str | None, Header(alias="X-API-Key")] = None,
-) -> UUID:
+    db: Session = Depends(get_db),
+) -> Merchant:
     """
     Returns the current merchant's ID. This authenticates the request coming from the
     web shop application.
@@ -40,9 +45,11 @@ def get_current_merchant(
     if not api_key:
         raise HTTPException(status_code=401, detail="X-API-Key header not set.")
 
-    # TODO: API key validation, merchant lookup and retrieval.
-    # Consider switching to returning the actual merchant object.
-    return UUID("00000000-0000-0000-0000-000000000000")
+    merchant = merchant_service.get_merchant_by_api_key(db, api_key)
+    if not merchant:
+        raise HTTPException(status_code=401, detail="Invalid API key.")
+
+    return merchant
 
 
 def is_admin(

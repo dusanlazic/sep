@@ -19,8 +19,8 @@ def get_container_ip(client, container_name):
         return f"Error: {str(e)}"
 
 
-def update_env_file(ip_address, template, env_file):
-    new_host_value = template % ip_address
+def update_env_file(ip_address, template, variable, env_file):
+    new_value = template % ip_address
 
     try:
         with open(env_file, "r") as file:
@@ -29,16 +29,16 @@ def update_env_file(ip_address, template, env_file):
         updated = False
         with open(env_file, "w") as file:
             for line in lines:
-                if line.startswith("FRONTEND_HOST="):
-                    file.write(f"FRONTEND_HOST={new_host_value}\n")
+                if line.startswith(variable + "="):
+                    file.write(f"{variable}={new_value}\n")
                     updated = True
                 else:
                     file.write(line)
 
             if not updated:
-                file.write(f"FRONTEND_HOST={new_host_value}\n")
+                file.write(f"{variable}={new_value}\n")
 
-        print(f"Updated FRONTEND_HOST in {env_file} to: {new_host_value}")
+        print(f"Updated {variable} in {env_file} to: {new_value}")
     except FileNotFoundError:
         print(f"Error: {env_file} not found.")
     except Exception as e:
@@ -48,14 +48,21 @@ def update_env_file(ip_address, template, env_file):
 if __name__ == "__main__":
     client = docker.from_env()
 
-    components = [
+    files = [
         (
             "psp-crypto-handler-reverse-proxy",
             "crypto.psp.%s.nip.io",
             "../../psp/crypto-handler/backend/.env.example",
+            "FRONTEND_HOST",
+        ),
+        (
+            "psp-core-reverse-proxy",
+            "psp.%s.nip.io",
+            "../../psp/core/backend/.env.example",
+            "FRONTEND_HOST",
         ),
     ]
 
-    for container_name, template, env_file in components:
+    for container_name, template, env_file, variable in files:
         ip_address = get_container_ip(client, container_name)
-        update_env_file(ip_address, template, env_file)
+        update_env_file(ip_address, template, variable, env_file)

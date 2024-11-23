@@ -45,7 +45,9 @@ def add_new_merchant(
     Add a new merchant to the handler and configure it.
     """
     merchant = (
-        db.query(Merchant).filter_by(psp_id=merchant_create_request.merchant_id).first()
+        db.query(Merchant)
+        .filter_by(psp_id=str(merchant_create_request.merchant_id))
+        .first()
     )
     if merchant:
         raise HTTPException(status_code=409, detail="Merchant already exists.")

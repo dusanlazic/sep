@@ -1,10 +1,16 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
 from ..auth.dependencies import get_current_merchant
+from ..database import get_db
+from ..merchants.models import Merchant
 from . import service
 from .schemas import (
     TransactionCreateRequest,
     TransactionCreateResponse,
+    TransactionDetailsResponse,
     TransactionProceedRequest,
     TransactionProceedResponse,
     TransactionStatusUpdateRequest,
@@ -15,11 +21,14 @@ router = APIRouter(prefix="/transactions")
 
 @router.post(
     "/",
-    dependencies=[Depends(get_current_merchant)],
     response_model=TransactionCreateResponse,
     tags=["Merchant Client App"],
 )
-def create_transaction(new_transaction: TransactionCreateRequest):
+def create_transaction(
+    transaction_creation_request: TransactionCreateRequest,
+    db: Session = Depends(get_db),
+    merchant: Merchant = Depends(get_current_merchant),
+):
     """
     Initialize a new transaction. Called by the merchant client application.
     Uses transaction ID (included in proceed_url) to redirect the user to the
@@ -27,20 +36,42 @@ def create_transaction(new_transaction: TransactionCreateRequest):
 
     Merchant client app should handle the transaction internally.
     """
-    pass
+    transaction = service.create_transaction(
+        db,
+        merchant,
+        transaction_creation_request.amount,
+        transaction_creation_request.subject,
+        transaction_creation_request.description,
+    )
+    proceed_url = service.generate_proceed_url(transaction.id)
+
+    return TransactionCreateResponse(
+        transaction_id=transaction.id,
+        proceed_url=proceed_url,
+    )
 
 
 @router.get(
     "/{transaction_id}",
-    response_model=TransactionCreateResponse,
+    response_model=TransactionDetailsResponse,
     tags=["Customer"],
 )
-def get_transaction(transaction_id: str):
+def get_transaction(
+    transaction_id: UUID,
+    db: Session = Depends(get_db),
+):
     """
     Retrieve the details of a transaction to display to the user.
     Includes the supported payment methods so the user can choose one.
     """
-    pass
+    transaction = service.get_transaction(db, transaction_id)
+    return TransactionDetailsResponse(
+        id=transaction.id,
+        amount=transaction.amount,
+        subject=transaction.subject,
+        description=transaction.description,
+        payment_methods=transaction.merchant.get_supported_payment_method_names(),
+    )
 
 
 @router.post(
