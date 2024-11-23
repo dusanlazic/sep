@@ -7,18 +7,20 @@ class PaymentMethodResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     name: str
-    config_schema: dict
+    configuration_schema: dict
 
 
 class PaymentMethodCreateRequest(BaseModel):
+    name: str = Field(description="Name of the payment method")
     host: str = Field(description="Host of the payment method")
     port: int = Field(description="Port of the payment method", ge=1, le=65535)
     # TODO: Replace host and port with Consul service name maybe?
 
 
 class MerchantPaymentMethodConfigurationResponse(BaseModel):
-    configuration_yaml: str
+    config: dict
+    yaml: str
 
 
 class MerchantPaymentMethodConfigurationRequest(BaseModel):
-    configuration_yaml: str
+    yaml: str

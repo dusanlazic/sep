@@ -66,17 +66,3 @@ def get_current_merchant_manager(
     Retrieve the current merchant's data.
     """
     return service.get_merchant_by_id(db, current_user_id)
-
-
-@router.get(
-    "/me/api-key",
-    dependencies=[Depends(get_current_merchant_manager_id)],
-    tags=["Merchant Manager"],
-)
-def get_api_key(
-    current_user_id: UUID = Depends(get_current_merchant_manager_id),
-) -> str:
-    """
-    Retrieve the current merchant's API key.
-    """
-    pass

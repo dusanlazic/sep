@@ -19,7 +19,11 @@ def get_current_merchant_manager_id(
     if not access_token:
         raise HTTPException(status_code=401, detail="Access token not provided.")
 
-    data = jwt.decode(access_token, config.secret_key, algorithms=["HS256"])
+    data = jwt.decode(
+        access_token,
+        config.secret_key.get_secret_value(),
+        algorithms=["HS256"],
+    )
     return UUID(data["sub"])
 
 
@@ -50,5 +54,4 @@ def is_admin(
     if not access_token:
         raise HTTPException(status_code=401, detail="Access token not provided.")
 
-    # TODO: Token validation and data extraction
-    return access_token == "admin"
+    return access_token == config.admin_secret.get_secret_value()
