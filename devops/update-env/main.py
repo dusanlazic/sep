@@ -99,6 +99,18 @@ if __name__ == "__main__":
             "../../bank/backend/.env",
             "FRONTEND_HOST",
         ),
+        (
+            "psp-core-reverse-proxy",
+            "http://api.psp.%s.nip.io/api/v1/",
+            "../../psp/core/frontend/.env",
+            "VITE_SERVER_URL",
+        ),
+        (
+            "bank-reverse-proxy",
+            "http://api.bank.%s.nip.io/api/v1/",
+            "../../bank/frontend/.env",
+            "VITE_SERVER_URL",
+        ),
     ]
 
     for container_name, template, env_file, variable in files:

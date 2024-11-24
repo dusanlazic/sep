@@ -28,7 +28,7 @@ const resetErrorMessages = () => {
 const isValidUUID = (id) => /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(id);
 
 onBeforeMount(async () => {
-  const id = route.query.transaction_id || null;
+  const id = route.query.payment_id || null;
   isInvalidTransaction.value = !id || !isValidUUID(id);
 
   if (!isInvalidTransaction.value) {

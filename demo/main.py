@@ -37,10 +37,10 @@ def register_merchant(username: str):
         "username": username,
         "password": "securepassword123",
         "title": "Random Merchant 3",
-        "payment_success_url": f"{TELECOM_FRONTEND}success",
-        "payment_failure_url": f"{TELECOM_FRONTEND}failure",
-        "payment_error_url": f"{TELECOM_FRONTEND}error",
-        "payment_callback_url": f"{TELECOM_FRONTEND}callback",
+        "payment_success_url": f"{TELECOM_FRONTEND}payments/success",
+        "payment_failure_url": f"{TELECOM_FRONTEND}payments/failure",
+        "payment_error_url": f"{TELECOM_FRONTEND}payments/error",
+        "payment_callback_url": f"{TELECOM_API}psp/callback",
     }
 
     response = requests.post(PSP_PUBLIC_FACING_API + "merchants/register", json=payload)
@@ -166,10 +166,10 @@ def merchant_update_own_config(token: str):
 
     yaml = f"""
 urls:
-    success: {TELECOM_FRONTEND}success
-    failure: {TELECOM_FRONTEND}failure
-    error: {TELECOM_FRONTEND}error
-    callback: {TELECOM_FRONTEND}callback
+    success: {TELECOM_FRONTEND}payments/success
+    failure: {TELECOM_FRONTEND}payments/failure
+    error: {TELECOM_FRONTEND}payments/error
+    callback: {TELECOM_API}psp/callback
 
 payment_methods:
     - name: bitcoin

@@ -13,7 +13,7 @@ router = APIRouter(prefix="/psp", tags=["PSP Integration"])
 @router.post("/callback")
 def update_transaction_status(
     db: Annotated[Session, Depends(get_db)],
-    orderStatusUpdateRequest: OrderStatusUpdateRequest
+    orderStatusUpdateRequest: OrderStatusUpdateRequest,
 ):
     """
     Update the status of a transaction.
@@ -22,6 +22,5 @@ def update_transaction_status(
     it lacks mechanisms to authenticate the PSP (e.g., API keys, signatures, etc.).
     """
 
-    service.update_transaction_status(db, orderStatusUpdateRequest);
-    
+    service.update_transaction_status(db, orderStatusUpdateRequest)
     return {"detail": "Status update received."}

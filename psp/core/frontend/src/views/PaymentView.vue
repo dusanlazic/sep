@@ -67,7 +67,7 @@ const handleChooseMethod = async (method) => {
               cursor-pointer bg-panel border border-black bg-zinc-700 rounded-lg shadow-inner"
               @click="handleChooseMethod(method.name)">
                 <div class="shrink-0">
-                  <img :src="`../src/assets/icons/${method.name}.png`" :alt="method.name" class="h-11 w-11 object-contain shrink-0">
+                  <img :src="`/icons/${method.name}.png`" :alt="method.name" class="h-11 w-11 object-contain shrink-0">
                 </div>
                 <div class="tracking-wider uppercase my-auto text-lg font-medium">
                   {{ method.name.replaceAll('_', ' ') }}
