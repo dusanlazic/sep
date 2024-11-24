@@ -1,17 +1,18 @@
+import { ax } from "@/utils/axios";
 
 export const getTransaction = async (id) => {
   try {
-    const response = await ax.post(`/transactions/${id}`);
+    const response = await ax.get(`/transactions/${id}`);
 
     console.log(response.data);
     
     if (!response?.data) {
-      return false;
+      return null;
     }
 
-    return true;
+    return response.data;
   } catch (error) {
     console.error(error);
-    return false;
+    return null;
   }
 };
