@@ -1,59 +1,96 @@
 <script setup>
 import { useRoute } from 'vue-router';
 import { ref, onBeforeMount } from 'vue';
+import { getTransaction } from '@/services/transaction.service';
 
 const isValidUUID = (id) => /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(id);
 
 const route = useRoute();
-const transactionId = ref(null);
 const isInvalidTransaction = ref(false);
-const paymentMethods = ref([
-  {
-    name: "CARD",
-  },
-  {
-    name: "PAYPAL",
-  }
-]);
+const paymentMethods = ref([]);
 
-onBeforeMount(() => {
+const isLoaded = ref(false);
+const transaction = ref();
+
+onBeforeMount(async () => {
   const id = route.query.transaction_id || null;
-  transactionId.value = id;
   isInvalidTransaction.value = !id || !isValidUUID(id);
+
+  if (!isInvalidTransaction.value) {
+    transaction.value = await getTransaction(id);
+    paymentMethods.value = transaction.value.payment_methods.map((m) => {
+      return {
+        name: m,
+      }
+    });
+  }
+
+  isLoaded.value = true;
 });
+
+const handleChooseMethod = (method) => {
+  console.log(`I choose: ${method}`)
+};
 
 </script>
 
 <template>
   <div class="flex items-center justify-center h-screen bg-zinc-800">
     <div v-if="isInvalidTransaction" class="text-center">
-      <h1 class="text-2xl font-bold text-red-600">Invalid Transaction</h1>
-      <p class="text-gray-600 mt-2">
+      <h1 class="text-2xl font-bold text-red-500">Invalid Transaction</h1>
+      <p class="text-zinc-400 mt-2">
         The transaction ID is invalid or missing.
       </p>
     </div>
 
-    <div v-else>
-      <div class="flex flex-col justify-center h-full w-full text-white px-4 sm:px-24 md:px-32 lg:px-40 xl:px-64 py-20">
-
+    <div v-else-if="isLoaded && transaction" class="flex justify-center">
+      <div class="flex flex-col justify-between min-h-120 w-96 bg-zinc-700 rounded-xl p-6">
+        <div>
+          <p class="text-xl md:text-3xl font-medium text-red-400">{{ transaction.subject }}</p>
+          <p class="text-zinc-300 text-sm mt-4">{{ transaction.description }}</p>
+        </div>
+        <div class="flex justify-between h-16 border-b border-dashed border-zinc-500">
+          <p class="text-xl font-bold text-zinc-300 mt-auto">Total</p>
+          <p class="text-xl font-bold text-zinc-300 mt-auto">€{{ transaction.amount }}</p>
+        </div>
+      </div>
+      
+      <div class="flex flex-col text-white p-6 w-96">
         <div class="flex flex-col select-none">
-          <div class="text-xl md:text-2xl w-72 text-center mx-auto">Choose your preferred method of payment</div>
-          <div class="flex flex-col gap-4 mt-6 w-80">
+          <div class="text-xl md:text-3xl w-72 text-center mx-auto text-zinc-300 font-medium">Pay with</div>
+          <div v-if="paymentMethods.length" class="flex flex-col gap-4 mt-6 w-80 mx-auto">
             <div v-for="method in paymentMethods">
-              <div class="flex gap-x-6 px-6 py-4 hover:bg-stone-700 hover:bg-opacity-30 cursor-pointer bg-panel border border-black bg-zinc-700 rounded-lg shadow-inner"
+              <div class="flex gap-x-6 px-6 py-4 hover:bg-stone-700 hover:bg-opacity-30 hover:text-red-400
+              cursor-pointer bg-panel border border-black bg-zinc-700 rounded-lg shadow-inner"
               @click="handleChooseMethod(method.name)">
                 <div class="shrink-0">
                   <img :src="`../src/assets/icons/${method.name}.png`" :alt="method.name" class="h-11 w-11 object-contain shrink-0">
                 </div>
-                <div class="tracking-wider uppercase my-auto">
+                <div class="tracking-wider uppercase my-auto text-lg font-medium">
                   {{ method.name.replaceAll('_', ' ') }}
                 </div>
               </div>
             </div>
           </div>
+          <div v-else class="animate-spin w-16 h-16 text-4xl mx-auto mt-20">
+            .
+          </div>
         </div>
-
       </div>
+    </div>
+
+    <div v-else-if="!isLoaded">
+      <div class="animate-spin w-16 h-16 text-4xl mx-auto text-zinc-300">
+        .
+      </div>
+      <p class="text-2xl text-zinc-300 mt-2">Loading...</p>
+    </div>
+
+    <div v-else class="text-center">
+      <h1 class="text-2xl font-bold text-zinc-200">Not Found</h1>
+      <p class="text-zinc-400 mt-2">
+        Transaction does not exist.
+      </p>
     </div>
   </div>
 </template>

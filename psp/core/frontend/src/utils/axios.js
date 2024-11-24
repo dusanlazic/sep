@@ -1,5 +1,4 @@
 import axios from 'axios';
-import router from "@/router";
 
 const ax = axios.create({
   baseURL: `${import.meta.env.VITE_SERVER_URL}`,
