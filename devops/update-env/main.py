@@ -87,6 +87,18 @@ if __name__ == "__main__":
             "../../telecom/frontend/.env",
             "VITE_SERVER_URL",
         ),
+        (
+            "bank-reverse-proxy",
+            "http://bank.%s.nip.io/api/v1/",
+            "../../psp/card-handler/backend/.env",
+            "BANK_API_URL",
+        ),
+        (
+            "bank-reverse-proxy",
+            "bank.%s.nip.io",
+            "../../bank/backend/.env",
+            "FRONTEND_HOST",
+        ),
     ]
 
     for container_name, template, env_file, variable in files:

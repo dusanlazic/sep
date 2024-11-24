@@ -1,10 +1,13 @@
+import os
 from pathlib import Path
+from dotenv import load_dotenv
 from urllib.parse import urlparse
 from rich import print_json
 import requests
 import logging
 import sys
 
+load_dotenv()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -14,16 +17,17 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-# Copy this from run.py output
-TELECOM_FRONTEND = "http://telecom.172.19.0.19.nip.io/"
-TELECOM_API = "http://api.telecom.172.19.0.19.nip.io/api/v1/"
-PSP_FRONTEND = "http://psp.172.19.0.20.nip.io/"
-PSP_PUBLIC_FACING_API = "http://api.psp.172.19.0.20.nip.io/api/v1/"
-PSP_INTERNAL_API = "http://psp-core-backend:9000/"
-PSP_CRYPTO_PAYMENT_PAGE = "http://crypto.psp.172.19.0.18.nip.io/"
-PSP_CRYPTO_PUBLIC_FACING_API = "http://crypto.psp.172.19.0.18.nip.io/api/v1/"
-PSP_CRYPTO_INTERNAL_API = "http://psp-crypto-handler-backend:9000/"
-PSP_CARD_INTERNAL_API = "http://psp-card-handler-backend:9000/"
+TELECOM_FRONTEND = os.getenv("TELECOM_FRONTEND")
+TELECOM_API = os.getenv("TELECOM_API")
+PSP_FRONTEND = os.getenv("PSP_FRONTEND")
+PSP_PUBLIC_FACING_API = os.getenv("PSP_PUBLIC_FACING_API")
+PSP_INTERNAL_API = os.getenv("PSP_INTERNAL_API")
+PSP_CRYPTO_PAYMENT_PAGE = os.getenv("PSP_CRYPTO_PAYMENT_PAGE")
+PSP_CRYPTO_PUBLIC_FACING_API = os.getenv("PSP_CRYPTO_PUBLIC_FACING_API")
+PSP_CRYPTO_INTERNAL_API = os.getenv("PSP_CRYPTO_INTERNAL_API")
+PSP_CARD_INTERNAL_API = os.getenv("PSP_CARD_INTERNAL_API")
+BANK_PAYMENT_PAGE = os.getenv("BANK_PAYMENT_PAGE")
+BANK_API = os.getenv("BANK_API")
 
 
 def register_merchant(username: str):
@@ -33,10 +37,10 @@ def register_merchant(username: str):
         "username": username,
         "password": "securepassword123",
         "title": "Random Merchant 3",
-        "payment_success_url": "https://example.com/success",
-        "payment_failure_url": "https://example.com/failure",
-        "payment_error_url": "https://example.com/error",
-        "payment_callback_url": "https://example.com/callback",
+        "payment_success_url": f"{TELECOM_FRONTEND}success",
+        "payment_failure_url": f"{TELECOM_FRONTEND}failure",
+        "payment_error_url": f"{TELECOM_FRONTEND}error",
+        "payment_callback_url": f"{TELECOM_FRONTEND}callback",
     }
 
     response = requests.post(PSP_PUBLIC_FACING_API + "merchants/register", json=payload)
@@ -137,15 +141,35 @@ def admin_add_payment_method_bitcoin():
     print_json(data=response.json())
 
 
+def admin_add_payment_method_card():
+    logger.info("Adding card payment method...")
+
+    parsed_url = urlparse(PSP_CARD_INTERNAL_API)
+
+    payload = {
+        "host": parsed_url.hostname,
+        "port": parsed_url.port,
+        "name": "card",
+    }
+
+    response = requests.post(
+        PSP_PUBLIC_FACING_API + "payment-methods",
+        json=payload,
+        cookies={"access_token": "hey_its_admin"},
+    )
+
+    print_json(data=response.json())
+
+
 def merchant_update_own_config(token: str):
     logger.info("Updating own configuration...")
 
-    yaml = """
+    yaml = f"""
 urls:
-    success: https://example.com/success
-    failure: https://example.com/failure
-    error: https://example.com/error
-    callback: https://example.com/callback
+    success: {TELECOM_FRONTEND}success
+    failure: {TELECOM_FRONTEND}failure
+    error: {TELECOM_FRONTEND}error
+    callback: {TELECOM_FRONTEND}callback
 
 payment_methods:
     - name: bitcoin
@@ -162,6 +186,11 @@ payment_methods:
           - "1P5ZEDWTKTFGxQjZphgWPQUpe554WKDfHQ"
           - "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkf"
           - "34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo"
+
+    - name: card
+      config:
+        bank_merchant_id: bc26c127-8670-4814-9e13-0e120d838e80
+        bank_merchant_password: 8Nl574GES1jmQjUvBqpDBhuhOLvU5QZ
 """
 
     payload = {"yaml": yaml}
@@ -228,14 +257,20 @@ def customer_gets_transaction_information_from_bitcoin_handler(transaction_id: s
 if __name__ == "__main__":
     merchant_username = "merchant5"
 
+    # Register a new merchant
     register_merchant(merchant_username)
     token = login_merchant(merchant_username)
     merchant_get_own_config(token)
     api_key = merchant_set_own_api_key(token)
 
+    # Adding payment methods
     admin_list_payment_methods()
     admin_add_payment_method_bitcoin()
+    admin_add_payment_method_card()
+    admin_list_payment_methods()
 
+    # Configure new merchant
+    merchant_get_own_config(token)
     merchant_update_own_config(token)
     merchant_get_own_config(token)
 
@@ -244,7 +279,13 @@ if __name__ == "__main__":
     transaction_id = merchant_app_initiate_transaction(api_key)
 
     customer_gets_transaction_information(transaction_id)
-    bitcoin_payment_url = customer_proceeds_with_transaction(transaction_id, "bitcoin")
-    bitcoin_transaction_id = bitcoin_payment_url.split("=")[-1]
 
-    customer_gets_transaction_information_from_bitcoin_handler(bitcoin_transaction_id)
+    # bitcoin payment
+    # bitcoin_payment_url = customer_proceeds_with_transaction(transaction_id, "bitcoin")
+    # bitcoin_transaction_id = bitcoin_payment_url.split("=")[-1]
+
+    # customer_gets_transaction_information_from_bitcoin_handler(bitcoin_transaction_id)
+
+    # card payment
+    card_payment_url = customer_proceeds_with_transaction(transaction_id, "card")
+    print(card_payment_url)

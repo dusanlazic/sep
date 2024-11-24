@@ -12,7 +12,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="Telecom Backend", lifespan=lifespan)
+app = FastAPI(title="Card Handler Backend", lifespan=lifespan)
 
 
 @app.get("/health", summary="Health Check")

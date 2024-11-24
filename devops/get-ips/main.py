@@ -76,6 +76,18 @@ if __name__ == "__main__":
             "http://internal-card.psp.%s.nip.io/api/v1/",
             "http://psp-card-handler-backend:9000/",
         ),
+        (
+            "bank-reverse-proxy",
+            "Bank Payment Page",
+            "http://bank.%s.nip.io/",
+            None,
+        ),
+        (
+            "bank-reverse-proxy",
+            "Bank API",
+            "http://api.bank.%s.nip.io/api/v1/",
+            None,
+        ),
     ]
 
     client = docker.from_env()
@@ -101,12 +113,15 @@ if __name__ == "__main__":
 
     print(table)
 
+    env_lines = []
+
     for container_name, name, public_url_template, internal_url in components:
         ip_address = get_container_ip(client, container_name)
-        print(
-            name.upper().replace("-", "_").replace(" ", "_"),
-            "=",
-            '"'
-            + (internal_url if internal_url else public_url_template % ip_address)
-            + '"',
+        env_var_name = name.upper().replace("-", "_").replace(" ", "_")
+        env_var_value = (
+            internal_url if internal_url else public_url_template % ip_address
         )
+        env_lines.append(f'{env_var_name}="{env_var_value}"')
+
+    with open("../../demo/.env", "w") as file:
+        file.write("\n".join(env_lines) + "\n")
