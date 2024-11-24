@@ -49,9 +49,13 @@ export const useSubscriptionStore = defineStore('subscriptions', () => {
         '/offers/subscriptions',
         data,
       );
-      const subscriptionResponse = response.data;
+      const responseData = response?.data;
       
-      console.log('SUB', subscriptionResponse);
+      console.log('SUB', responseData);
+
+      if (responseData && responseData.payment_url) {
+        window.location.href = responseData.payment_url;
+      }
 
       return true;
     } catch (error) {

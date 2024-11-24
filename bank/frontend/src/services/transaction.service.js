@@ -4,9 +4,11 @@ export const pay = async (id, data) => {
   try {
     const response = await ax.post(`/transactions/${id}/pay`, data);
 
-    const data = response.data;
+    const responseData = response.data;
     
-    window.location.href = data.next_url;
+    if (responseData && responseData.next_url) {
+      window.location.href = responseData.next_url;
+    }
 
     return true;
   } catch (error) {
