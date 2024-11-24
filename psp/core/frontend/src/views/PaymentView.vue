@@ -7,6 +7,7 @@ const isValidUUID = (id) => /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-
 
 const route = useRoute();
 const isInvalidTransaction = ref(false);
+const isPaymentInProgress = ref(false);
 const paymentMethods = ref([]);
 
 const isLoaded = ref(false);
@@ -18,7 +19,7 @@ onBeforeMount(async () => {
 
   if (!isInvalidTransaction.value) {
     transaction.value = await getTransaction(id);
-    paymentMethods.value = transaction.value.payment_methods.map((m) => {
+    paymentMethods.value = transaction?.value?.payment_methods?.map((m) => {
       return {
         name: m,
       }
@@ -29,8 +30,9 @@ onBeforeMount(async () => {
 });
 
 const handleChooseMethod = async (method) => {
-  console.log(`I choose: ${method}`)
+  isPaymentInProgress.value = true;
   await proceedWithTransaction(transaction.value.id, method);
+  isPaymentInProgress.value = false;
 };
 
 </script>
@@ -44,7 +46,7 @@ const handleChooseMethod = async (method) => {
       </p>
     </div>
 
-    <div v-else-if="isLoaded && transaction" class="flex justify-center">
+    <div v-else-if="isLoaded && transaction && !isPaymentInProgress" class="flex justify-center">
       <div class="flex flex-col justify-between min-h-120 w-96 bg-zinc-700 rounded-xl p-6">
         <div>
           <p class="text-xl md:text-3xl font-medium text-red-400">{{ transaction.subject }}</p>
@@ -78,6 +80,13 @@ const handleChooseMethod = async (method) => {
           </div>
         </div>
       </div>
+    </div>
+
+    <div v-else-if="!isInvalidTransaction && isLoaded && isPaymentInProgress">
+      <div class="animate-spin w-16 h-16 text-4xl mx-auto text-red-400">
+        .
+      </div>
+      <p class="text-2xl text-zinc-200 mt-4 text-center">Processing your payment</p>
     </div>
 
     <div v-else-if="!isLoaded">
