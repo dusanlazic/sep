@@ -17,9 +17,13 @@ export const getTransaction = async (id) => {
 
 export const proceedWithTransaction = async (id, method) => {
   try {
-    await ax.post(`/transactions/${id}/proceed`, {
+    const response = await ax.post(`/transactions/${id}/proceed`, {
       payment_method_name: method,
     });
+
+    if (response?.data && response?.data?.payment_url) {
+      window.location.href = response.data.payment_url;
+    }
   } catch (error) {
     console.error(error);
   }

@@ -26,7 +26,7 @@ def health_check():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[config.frontend_host, "http://localhost:5174"],
+    allow_origins=[config.frontend_host, "http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
