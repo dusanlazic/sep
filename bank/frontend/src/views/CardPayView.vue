@@ -1,98 +1,125 @@
 <script setup>
-  import { ref } from 'vue';
+import { pay } from '@/services/transaction.service';
+import { onBeforeMount, ref } from 'vue';
+import { useRoute } from 'vue-router';
 
-  const cardHolder = ref('');
-  const cardNumber = ref('');
-  const expiryDate = ref('');
-  const cvv = ref('');
-  const cardHolderErrorMessage = ref('');
-  const cardNumberErrorMessage = ref('');
-  const expiryDateErrorMessage = ref('');
-  const cvvErrorMessage = ref('');
+const route = useRoute();
 
-  const resetErrorMessages = () => {
-    cardHolderErrorMessage.value = '';
-    cardNumberErrorMessage.value = '';
-    expiryDateErrorMessage.value = '';
-    cvvErrorMessage.value = '';
-  };
+const transactionId = ref();
+const isInvalidTransaction = ref(false);
+const isPaymentInProgress = ref(false);
 
-  const handlePay = () => {
-    if (isDataValid()) {
-      // proceed
-    }
-  };
+const cardHolder = ref('');
+const cardNumber = ref('');
+const expiryDate = ref('');
+const cvv = ref('');
+const cardHolderErrorMessage = ref('');
+const cardNumberErrorMessage = ref('');
+const expiryDateErrorMessage = ref('');
+const cvvErrorMessage = ref('');
 
-  const isDataValid = () => {
-    let valid = true;
-    if (cardHolder.value.trim().length === 0) {
-      cardHolderErrorMessage.value = 'Card holder name cannot be empty';
-      valid = false;
-    }
-    if (cardNumber.value.trim().length === 0) {
-      cardNumberErrorMessage.value = 'Card number cannot be empty';
-      valid = false;
-    }
-    else if (!cardNumber.value.replace(/\s/g, '').match(/^[\d]{16}$/g)) {
-      cardNumberErrorMessage.value = 'Card number invalid';
-      valid = false;
-    }
-    if (expiryDate.value.trim().length === 0) {
-      expiryDateErrorMessage.value = 'Expiry date cannot be empty';
-      valid = false;
-    }
-    else if (!expiryDate.value.match(/^[\d]{2}\/[\d]{2}$/g)) {
-      expiryDateErrorMessage.value = 'Expiry date invalid';
-      valid = false;
-    }
-    else if (Number(expiryDate.value.slice(0,2)) > 12 || Number(expiryDate.value.slice(0,2)) < 1) {
-      expiryDateErrorMessage.value = 'Expiry date invalid';
-      valid = false;
-    }
-    else if (Number(expiryDate.value.slice(0,2)) > 12 || Number(expiryDate.value.slice(0,2)) < 1) {
-      expiryDateErrorMessage.value = 'Expiry date invalid';
-      valid = false;
-    }
-    if (cvv.value.trim().length === 0) {
-      cvvErrorMessage.value = 'CVV cannot be empty';
-      valid = false;
-    }
-    else if (!cvv.value.match(/^[\d]{3}$/g)) {
-      cvvErrorMessage.value = 'CVV invalid';
-      valid = false;
-    }
-    return valid
-  };
+const resetErrorMessages = () => {
+  cardHolderErrorMessage.value = '';
+  cardNumberErrorMessage.value = '';
+  expiryDateErrorMessage.value = '';
+  cvvErrorMessage.value = '';
+};
 
-  const formatCardNumber = () => {
-    if (cardNumber.value.replace(/\s/g, '').length > 16) {
-      cardNumber.value = cardNumber.value.replace(/\s/g, '').slice(0, 16);
-    }
-    var strippedInput = cardNumber.value.replace(/\s/g, '');
-    var formattedInput = strippedInput.replace(/(\d{4})(?=\d)/g, '$1 ');
-    cardNumber.value = formattedInput;
-  };
+const isValidUUID = (id) => /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(id);
 
-  const formatExpiryDate = () => {
-    if (expiryDate.value.replace(/\s/g, '').replace('/', '').length > 4) {
-      expiryDate.value = expiryDate.value.replace(/\s/g, '').replace('/', '').slice(0, 4);
-    }
-    var strippedInput = expiryDate.value.replace(/\s/g, '');
-    var formattedInput = strippedInput.replace(/(\d{2})(?=\d)/g, '$1/');
-    expiryDate.value = formattedInput;
-  };
+onBeforeMount(async () => {
+  const id = route.query.transaction_id || null;
+  isInvalidTransaction.value = !id || !isValidUUID(id);
 
-  const formatCvv = () => {
-    if (cvv.value.replace(/\s/g, '').length > 3) {
-      cvv.value = cvv.value.replace(/\s/g, '').replace('/', '').slice(0, 3);
-    }
-  };
+  if (!isInvalidTransaction.value) {
+    transactionId.value = id;
+  }
+});
 
+const isDataValid = () => {
+  let valid = true;
+  if (cardHolder.value.trim().length === 0) {
+    cardHolderErrorMessage.value = 'Card holder name cannot be empty';
+    valid = false;
+  }
+  if (cardNumber.value.trim().length === 0) {
+    cardNumberErrorMessage.value = 'Card number cannot be empty';
+    valid = false;
+  }
+  else if (!cardNumber.value.replace(/\s/g, '').match(/^[\d]{16}$/g)) {
+    cardNumberErrorMessage.value = 'Card number invalid';
+    valid = false;
+  }
+  if (expiryDate.value.trim().length === 0) {
+    expiryDateErrorMessage.value = 'Expiry date cannot be empty';
+    valid = false;
+  }
+  else if (!expiryDate.value.match(/^[\d]{2}\/[\d]{2}$/g)) {
+    expiryDateErrorMessage.value = 'Expiry date invalid';
+    valid = false;
+  }
+  else if (Number(expiryDate.value.slice(0,2)) > 12 || Number(expiryDate.value.slice(0,2)) < 1) {
+    expiryDateErrorMessage.value = 'Expiry date invalid';
+    valid = false;
+  }
+  else if (Number(expiryDate.value.slice(0,2)) > 12 || Number(expiryDate.value.slice(0,2)) < 1) {
+    expiryDateErrorMessage.value = 'Expiry date invalid';
+    valid = false;
+  }
+  if (cvv.value.trim().length === 0) {
+    cvvErrorMessage.value = 'CVV cannot be empty';
+    valid = false;
+  }
+  else if (!cvv.value.match(/^[\d]{3}$/g)) {
+    cvvErrorMessage.value = 'CVV invalid';
+    valid = false;
+  }
+  return valid
+};
+
+const formatCardNumber = () => {
+  if (cardNumber.value.replace(/\s/g, '').length > 16) {
+    cardNumber.value = cardNumber.value.replace(/\s/g, '').slice(0, 16);
+  }
+  var strippedInput = cardNumber.value.replace(/\s/g, '');
+  var formattedInput = strippedInput.replace(/(\d{4})(?=\d)/g, '$1 ');
+  cardNumber.value = formattedInput;
+};
+
+const formatExpiryDate = () => {
+  if (expiryDate.value.replace(/\s/g, '').replace('/', '').length > 4) {
+    expiryDate.value = expiryDate.value.replace(/\s/g, '').replace('/', '').slice(0, 4);
+  }
+  var strippedInput = expiryDate.value.replace(/\s/g, '');
+  var formattedInput = strippedInput.replace(/(\d{2})(?=\d)/g, '$1/');
+  expiryDate.value = formattedInput;
+};
+
+const formatCvv = () => {
+  if (cvv.value.replace(/\s/g, '').length > 3) {
+    cvv.value = cvv.value.replace(/\s/g, '').replace('/', '').slice(0, 3);
+  }
+};
+
+const handlePay = async () => {
+  if (isDataValid()) {
+    isPaymentInProgress.value = true;
+    
+    await pay(transactionId.value, {
+      card_number: cardNumber.value,
+      card_expiration: expiryDate.value,
+      card_cvv: cvv.value,
+      card_holder: cardHolder.value,
+    });
+
+    isPaymentInProgress.value = false;
+  }
+};
 </script>
 
 <template>
   <div class="relative flex flex-col justify-center min-h-screen bg-gray-50">
-    <div class="flex flex-col justify-between mx-4 md:mx-auto md:w-108 h-96 p-4">
+    <div v-if="!isInvalidTransaction && !isPaymentInProgress" class="flex flex-col justify-between mx-4 md:mx-auto md:w-108 h-96 p-4">
       <div class="flex flex-col">
         <div class="text-sm text-center tracking-wide">Please fill in your card details to proceed with the payment</div>
         <div class="flex flex-col gap-y-4 mt-8">
@@ -181,6 +208,18 @@
         Pay
       </button>
 
+    </div>
+    <div v-else-if="!isInvalidTransaction && isPaymentInProgress">
+      <div class="animate-spin w-16 h-16 text-4xl mx-auto text-zinc-800">
+        .
+      </div>
+      <p class="text-2xl text-zinc-800 mt-4 text-center">Processing your payment</p>
+    </div>
+    <div v-else-if="isInvalidTransaction" class="text-center">
+      <h1 class="text-2xl font-bold text-red-500">Invalid Transaction</h1>
+      <p class="text-zinc-400 mt-2">
+        The transaction ID is invalid or missing.
+      </p>
     </div>
   </div>
 </template>
