@@ -1,7 +1,7 @@
 <script setup>
 import { useRoute } from 'vue-router';
 import { ref, onBeforeMount } from 'vue';
-import { getTransaction } from '@/services/transaction.service';
+import { getTransaction, proceedWithTransaction } from '@/services/transaction.service';
 
 const isValidUUID = (id) => /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(id);
 
@@ -28,8 +28,9 @@ onBeforeMount(async () => {
   isLoaded.value = true;
 });
 
-const handleChooseMethod = (method) => {
+const handleChooseMethod = async (method) => {
   console.log(`I choose: ${method}`)
+  await proceedWithTransaction(transaction.value.id, method);
 };
 
 </script>
@@ -57,8 +58,8 @@ const handleChooseMethod = (method) => {
       
       <div class="flex flex-col text-white p-6 w-96">
         <div class="flex flex-col select-none">
-          <div class="text-xl md:text-3xl w-72 text-center mx-auto text-zinc-300 font-medium">Pay with</div>
-          <div v-if="paymentMethods.length" class="flex flex-col gap-4 mt-6 w-80 mx-auto">
+          <div class="text-xl md:text-3xl text-zinc-300 font-medium">Pay with</div>
+          <div v-if="paymentMethods.length" class="flex flex-col space-y-4 mt-4 w-full">
             <div v-for="method in paymentMethods">
               <div class="flex gap-x-6 px-6 py-4 hover:bg-stone-700 hover:bg-opacity-30 hover:text-red-400
               cursor-pointer bg-panel border border-black bg-zinc-700 rounded-lg shadow-inner"
