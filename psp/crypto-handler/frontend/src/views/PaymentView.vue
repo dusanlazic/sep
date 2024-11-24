@@ -42,7 +42,7 @@ const startCheckingForPayment = (id) => {
   const interval = setInterval(async () => {
     await fetchTransaction(id);
     checkStatusChange(interval);
-  }, 1000);
+  }, 5000);
 };
 </script>
 
