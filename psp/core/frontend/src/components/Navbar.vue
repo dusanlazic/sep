@@ -1,8 +1,16 @@
 <script setup>
-import { useAuthStore } from '@/stores/auth.store';
 import { ref } from 'vue';
+import { useAuthStore } from '@/stores/auth.store';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const authStore = useAuthStore();
+
+const handleLogout = async () =>{
+  await authStore.logout();
+  router.push('/');
+};
 
 const isPaymentPage = ref(window.location.href.includes('/payment'));
 </script>
@@ -29,7 +37,7 @@ const isPaymentPage = ref(window.location.href.includes('/payment'));
           <RouterLink to="/account" class="text-xs font-medium tracking-wider text-zinc-500 hover:text-zinc-100">
             ACCOUNT
           </RouterLink>
-          <button class="text-xs font-medium tracking-wider text-zinc-500 hover:text-zinc-100">
+          <button @click="handleLogout" class="text-xs font-medium tracking-wider text-zinc-500 hover:text-zinc-100">
             LOG OUT
           </button>
         </div>
