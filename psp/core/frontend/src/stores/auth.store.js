@@ -14,7 +14,8 @@ export const useAuthStore = defineStore('auth', () => {
       
       session.value = {
         username: user.username,
-        fullName: user.full_name,
+        title: user.title,
+        apiKey: user.api_key
       };
 
       localStorage.setItem('session', JSON.stringify(session.value));
@@ -62,7 +63,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function logout() {
     await ax.post(
-      '/auth/logout',
+      '/merchants/logout',
     );
     clearSession();
   }
