@@ -1,5 +1,8 @@
 <script setup>
+import { useAuthStore } from '@/stores/auth.store';
 import { ref } from 'vue';
+
+const authStore = useAuthStore();
 
 const isPaymentPage = ref(window.location.href.includes('/payment'));
 </script>
@@ -13,8 +16,7 @@ const isPaymentPage = ref(window.location.href.includes('/payment'));
       </RouterLink>
       
       <div v-if="!isPaymentPage">
-        <!-- <div v-if="!authStore.isUserLoggedIn()"> -->
-        <div v-if="true">
+        <div v-if="!authStore.isUserLoggedIn()">
           <RouterLink
             to="/login"
           >
@@ -24,10 +26,10 @@ const isPaymentPage = ref(window.location.href.includes('/payment'));
         </div>
 
         <div v-else class="flex space-x-8">
-          <RouterLink to="/account" class="text-xs font-medium tracking-wider text-gray-500 hover:text-black">
+          <RouterLink to="/account" class="text-xs font-medium tracking-wider text-zinc-500 hover:text-zinc-100">
             ACCOUNT
           </RouterLink>
-          <button class="text-xs font-medium tracking-wider text-gray-500 hover:text-black">
+          <button class="text-xs font-medium tracking-wider text-zinc-500 hover:text-zinc-100">
             LOG OUT
           </button>
         </div>
