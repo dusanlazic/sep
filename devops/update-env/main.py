@@ -111,6 +111,12 @@ if __name__ == "__main__":
             "../../bank/frontend/.env",
             "VITE_SERVER_URL",
         ),
+        (
+            "psp-crypto-handler-reverse-proxy",
+            "http://crypto.psp.%s.nip.io/api/v1/",
+            "../../psp/crypto-handler/frontend/.env",
+            "VITE_SERVER_URL",
+        ),
     ]
 
     for container_name, template, env_file, variable in files:
