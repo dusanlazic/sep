@@ -77,15 +77,27 @@ if __name__ == "__main__":
             "http://psp-card-handler-backend:9000/",
         ),
         (
-            "bank-reverse-proxy",
-            "Bank Payment Page",
-            "http://bank.%s.nip.io/",
+            "unicredit-bank-reverse-proxy",
+            "Unicredit Bank Payment Page",
+            "http://unicredit.%s.nip.io/",
             None,
         ),
         (
-            "bank-reverse-proxy",
-            "Bank API",
-            "http://api.bank.%s.nip.io/api/v1/",
+            "erste-bank-reverse-proxy",
+            "Erste Bank Payment Page",
+            "http://erste.%s.nip.io/",
+            None,
+        ),
+        (
+            "unicredit-bank-reverse-proxy",
+            "Unicredit Bank API",
+            "http://api.unicredit.%s.nip.io/api/v1/",
+            None,
+        ),
+        (
+            "erste-bank-reverse-proxy",
+            "Erste Bank API",
+            "http://api.erste.%s.nip.io/api/v1/",
             None,
         ),
     ]

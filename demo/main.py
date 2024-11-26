@@ -189,6 +189,7 @@ payment_methods:
 
     - name: card
       config:
+        bank_name: unicredit
         bank_merchant_id: bc26c127-8670-4814-9e13-0e120d838e80
         bank_merchant_password: 8Nl574GES1jmQjUvBqpDBhuhOLvU5QZ
 """

@@ -3,12 +3,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from .database import create_tables
+from .populate import create_banks
 from .routes import router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_tables()
+    create_banks()
     yield
 
 

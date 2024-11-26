@@ -33,14 +33,7 @@ class Merchant(Base):
         primary_key=True,
         default=uuid.uuid4,
     )
-    psp_id: Mapped[str] = mapped_column(String, nullable=False, unique=True)
-    bank_name: Mapped[str] = mapped_column(String, nullable=False)
-    bank_merchant_id: Mapped[str] = mapped_column(String, nullable=False)
-    bank_merchant_password: Mapped[str] = mapped_column(
-        String,
-        nullable=False,
-        unique=True,
-    )
+    password: Mapped[str] = mapped_column(String, nullable=False)
 
     transactions: Mapped[list["Transaction"]] = relationship(
         "Transaction",
@@ -57,8 +50,6 @@ class Transaction(Base):
         primary_key=True,
         default=uuid.uuid4,
     )
-    psp_id: Mapped[str] = mapped_column(String, nullable=False, unique=True)
-    bank_payment_id: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     merchant_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey(Merchant.id), nullable=False
     )
@@ -66,6 +57,9 @@ class Transaction(Base):
     status: Mapped[TransactionStatus] = mapped_column(
         Enum(TransactionStatus, native_enum=True), nullable=False
     )
+    success_url: Mapped[str] = mapped_column(String, nullable=False)
+    failure_url: Mapped[str] = mapped_column(String, nullable=False)
+    error_url: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
@@ -78,13 +72,16 @@ class Transaction(Base):
     )
 
 
-class Bank(Base):
-    __tablename__ = "banks"
+class Account(Base):
+    __tablename__ = "accounts"
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         primary_key=True,
         default=uuid.uuid4,
     )
-    name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
-    api_base_url: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    card_number: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    card_holder_name: Mapped[str] = mapped_column(String, nullable=False)
+    expiration_date: Mapped[str] = mapped_column(String, nullable=False)
+    cvv: Mapped[str] = mapped_column(String, nullable=False)
+    balance: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)

@@ -25,6 +25,7 @@ def update_env_file(ip_address, template, variable, env_file):
     new_value = template % ip_address
 
     try:
+        # If env_file file doesn't exist, copy .env.example into env_file
         if not os.path.exists(env_file):
             shutil.copy(
                 env_file.replace(".env", ".env.example"),
@@ -88,27 +89,45 @@ if __name__ == "__main__":
             "VITE_SERVER_URL",
         ),
         (
-            "bank-reverse-proxy",
-            "http://bank.%s.nip.io/api/v1/",
+            "unicredit-bank-reverse-proxy",
+            "http://unicredit.%s.nip.io/api/v1/",
             "../../psp/card-handler/backend/.env",
-            "BANK_API_URL",
+            "POPULATE_UNICREDIT_BANK_API_URL",
         ),
         (
-            "bank-reverse-proxy",
-            "bank.%s.nip.io",
-            "../../bank/backend/.env",
+            "erste-bank-reverse-proxy",
+            "http://erste.%s.nip.io/api/v1/",
+            "../../psp/card-handler/backend/.env",
+            "POPULATE_ERSTE_BANK_API_URL",
+        ),
+        (
+            "unicredit-bank-reverse-proxy",
+            "unicredit.%s.nip.io",
+            "../../bank/unicredit/backend/.env",
             "FRONTEND_HOST",
+        ),
+        (
+            "erste-bank-reverse-proxy",
+            "erste.%s.nip.io",
+            "../../bank/erste/backend/.env",
+            "FRONTEND_HOST",
+        ),
+        (
+            "unicredit-bank-reverse-proxy",
+            "http://api.unicredit.%s.nip.io/api/v1/",
+            "../../bank/unicredit/frontend/.env",
+            "VITE_SERVER_URL",
+        ),
+        (
+            "erste-bank-reverse-proxy",
+            "http://api.erste.%s.nip.io/api/v1/",
+            "../../bank/erste/frontend/.env",
+            "VITE_SERVER_URL",
         ),
         (
             "psp-core-reverse-proxy",
             "http://api.psp.%s.nip.io/api/v1/",
             "../../psp/core/frontend/.env",
-            "VITE_SERVER_URL",
-        ),
-        (
-            "bank-reverse-proxy",
-            "http://api.bank.%s.nip.io/api/v1/",
-            "../../bank/frontend/.env",
             "VITE_SERVER_URL",
         ),
         (

@@ -1,5 +1,6 @@
 include:
-  - bank/compose.yaml
+  - bank/erste/compose.yaml
+  - bank/unicredit/compose.yaml
   - pcc/compose.yaml
   - psp/compose.yaml
   - telecom/compose.yaml

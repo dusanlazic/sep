@@ -24,6 +24,7 @@ class HandlerConfigurationSchemaResponse(BaseModel):
 
 
 class MerchantConfiguration(BaseModel):
+    bank_name: str
     bank_merchant_id: str
     bank_merchant_password: str
 

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from .config import config
 from .database import get_db
-from .models import Merchant, Transaction, TransactionStatus
+from .models import Bank, Merchant, Transaction, TransactionStatus
 from .schemas import (
     ConfigureMerchantRequest,
     HandlerConfigurationSchemaResponse,
@@ -54,6 +54,7 @@ def add_new_merchant(
 
     new_merchant = Merchant(
         psp_id=merchant_create_request.merchant_id,
+        bank_name=merchant_create_request.configuration.bank_name,
         bank_merchant_id=merchant_create_request.configuration.bank_merchant_id,
         bank_merchant_password=merchant_create_request.configuration.bank_merchant_password,
     )
@@ -94,10 +95,10 @@ def proceed_with_transaction(
             "error_url": transaction_proceed_request.next_urls.error.unicode_string(),
         }
 
-        print(payload)
+        bank = db.query(Bank).filter(Bank.name == merchant.bank_name).first()
 
         bank_response = requests.post(
-            config.bank_api_url + "transactions",
+            bank.api_base_url + "transactions",
             json=payload,
         )
         bank_response.raise_for_status()

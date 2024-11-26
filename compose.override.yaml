@@ -1,6 +1,9 @@
 ---
 services:
-  bank-db:
+  unicredit-bank-db:
+    ports:
+      - 5431:5432
+  erste-bank-db:
     ports:
       - 5432:5432
   pcc-db:
