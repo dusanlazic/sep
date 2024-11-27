@@ -1,6 +1,9 @@
 # sep
 💳 Sistemi elektronskog plaćanja
 
+![](./docs/SEP2.svg)
+
+
 ## Code Quality
 
 ### EditorConfig
