@@ -27,14 +27,14 @@ def create_merchants():
 def create_accounts():
     with get_db_session() as db:
         account = (
-            db.query(Account).filter(Account.card_number == "4381131213121312").first()
+            db.query(Account).filter(Account.card_number == "4026367361591816").first()
         )
         if account:
             print("Accounts already exist.")
             return
 
         account_1 = Account(
-            card_number="4381131213121312",
+            card_number="4026367361591816",
             card_holder_name="John Doe",
             expiration_date="01/26",
             cvv="123",
@@ -42,7 +42,7 @@ def create_accounts():
         )
 
         account_2 = Account(
-            card_number="4381133713371337",
+            card_number="4026362570667143",
             card_holder_name="Jane Doe",
             expiration_date="01/26",
             cvv="123",

@@ -1,9 +1,11 @@
-from pydantic import BaseModel
+from pydantic import UUID4, AwareDatetime, BaseModel
 
 
-class FooRequest(BaseModel):
-    fizz: str
-
-
-class BarResponse(BaseModel):
-    buzz: int
+class PaymentRequest(BaseModel):
+    amount: float
+    acquirer_order_id: UUID4
+    acquirer_timestamp: AwareDatetime
+    card_number: str
+    card_expiration: str
+    card_cvv: str
+    card_holder: str

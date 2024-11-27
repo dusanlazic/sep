@@ -100,6 +100,12 @@ if __name__ == "__main__":
             "http://api.erste.%s.nip.io/api/v1/",
             None,
         ),
+        (
+            "pcc-backend",
+            "PCC API",
+            "http://pcc.%s.nip.io/api/v1/",
+            "http://pcc-backend:9000/",
+        ),
     ]
 
     client = docker.from_env()

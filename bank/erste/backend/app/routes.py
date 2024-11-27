@@ -1,5 +1,9 @@
+import uuid
+from datetime import datetime
 from urllib.parse import urlencode, urlunparse
+from zoneinfo import ZoneInfo
 
+import requests
 from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.orm import Session
 
@@ -9,6 +13,9 @@ from .models import Account, Merchant, Transaction, TransactionStatus
 from .schemas import (
     PaymentInstructionsResponse,
     PaymentRequest,
+    PaymentResultResponse,
+    PccPaymentRequest,
+    PccPaymentResponse,
     TransactionCreateRequest,
 )
 
@@ -63,11 +70,12 @@ def create_transaction(
 
 @router.post(
     "/transactions/{transaction_id}/pay",
+    response_model=PaymentResultResponse,
+    tags=["Customer"],
 )
 def pay_transaction(
     transaction_id: str,
     card_info: PaymentRequest,
-    response: Response,
     db: Session = Depends(get_db),
 ):
     """
@@ -77,36 +85,95 @@ def pay_transaction(
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found.")
 
+    pcc_response = requests.post(
+        f"{config.pcc_api_base_url}/request-payment",
+        json={
+            "amount": transaction.amount,
+            "card_number": card_info.card_number,
+            "card_expiration": card_info.card_expiration,
+            "card_cvv": card_info.card_cvv,
+            "card_holder": card_info.card_holder,
+            "acquirer_order_id": str(uuid.uuid4()),
+            "acquirer_timestamp": datetime.now().astimezone().isoformat(),
+        },
+    )
+
+    if pcc_response.json()["status"] == "success":
+        requests.put(
+            f"{config.psp_api_base_url}/transactions/{transaction_id}/status",
+            json={"status": "completed"},
+        )
+
+        return PaymentResultResponse(
+            detail="Payment successful.",
+            next_url=transaction.success_url,
+        )
+    else:
+        requests.put(
+            f"{config.psp_api_base_url}/transactions/{transaction_id}/status",
+            json={"status": "failed"},
+        )
+
+        return PaymentResultResponse(
+            detail=pcc_response.json()["msg"],
+            next_url=transaction.failure_url,
+        )
+
+
+@router.post(
+    "/pcc/request-payment",
+    response_model=PccPaymentResponse,
+    tags=["PCC"],
+)
+def process_pcc_request(
+    payment_request: PccPaymentRequest,
+    response: Response,
+    db: Session = Depends(get_db),
+):
     account = (
         db.query(Account)
         .filter_by(
-            card_number=card_info.card_number,
-            card_expiration=card_info.card_expiration,
-            card_cvv=card_info.card_cvv,
-            card_holder=card_info.card_holder,
+            card_number=payment_request.card_number.replace(" ", ""),
+            expiration_date=payment_request.card_expiration,
+            cvv=payment_request.card_cvv,
+            card_holder_name=payment_request.card_holder,
         )
         .first()
     )
 
+    issuer_order_id = str(uuid.uuid4())
+    issuer_timestamp = datetime.now().astimezone().isoformat()
+
     if not account:
         response.status_code = 400
-        return {
-            "error": "Invalid card information.",
-            "next_url": transaction.error_url,
-        }
+        return PccPaymentResponse(
+            acquirer_order_id=payment_request.acquirer_order_id,
+            acquirer_timestamp=payment_request.acquirer_timestamp,
+            issuer_order_id=issuer_order_id,
+            issuer_timestamp=issuer_timestamp,
+            status="error",
+            msg="Payment details invalid.",
+        )
 
-    if account.balance < transaction.amount:
+    if account.balance < payment_request.amount:
         response.status_code = 400
-        return {
-            "error": "Insufficient funds.",
-            "next_url": transaction.failure_url,
-        }
+        return PccPaymentResponse(
+            acquirer_order_id=payment_request.acquirer_order_id,
+            acquirer_timestamp=payment_request.acquirer_timestamp,
+            issuer_order_id=issuer_order_id,
+            issuer_timestamp=issuer_timestamp,
+            status="error",
+            msg="Insufficient funds.",
+        )
 
-    transaction.status = TransactionStatus.COMPLETED
-    account.balance -= transaction.amount
-
+    account.balance -= payment_request.amount
     db.commit()
-    return {
-        "details": "Payment successful.",
-        "next_url": transaction.success_url,
-    }
+
+    return PccPaymentResponse(
+        acquirer_order_id=payment_request.acquirer_order_id,
+        acquirer_timestamp=payment_request.acquirer_timestamp,
+        issuer_order_id=issuer_order_id,
+        issuer_timestamp=issuer_timestamp,
+        status="success",
+        msg="Payment successful.",
+    )
