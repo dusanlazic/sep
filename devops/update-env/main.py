@@ -73,6 +73,12 @@ if __name__ == "__main__":
         (
             "psp-core-reverse-proxy",
             "http://psp.%s.nip.io/api/v1",
+            "../../psp/paypal-handler/backend/.env",
+            "PSP_API_BASE_URL",
+        ),
+        (
+            "psp-core-reverse-proxy",
+            "http://psp.%s.nip.io/api/v1",
             "../../telecom/backend/.env",
             "PSP_API_BASE_URL",
         ),
