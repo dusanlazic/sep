@@ -32,10 +32,12 @@ def apply_merchant_payment_methods_configuration(
         raise HTTPException(
             status_code=400, detail="Failed to parse YAML configuration"
         )
-
+    
     for payment_method in new_config["payment_methods"]:
         name: str = payment_method["name"]
         config: dict = payment_method["config"]
+
+        print(payment_method)
 
         payment_method = (
             db.query(PaymentMethod).filter(PaymentMethod.name == name).first()
@@ -52,6 +54,7 @@ def apply_merchant_payment_methods_configuration(
                 f"http://{payment_method.host}:{payment_method.port}/merchants",
                 json=payload,
             )
+            print(response)
             response.raise_for_status()
         except Exception as e:
             raise HTTPException(

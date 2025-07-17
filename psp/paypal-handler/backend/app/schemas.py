@@ -40,3 +40,7 @@ class MerchantConfiguration(BaseModel):
 class ConfigureMerchantRequest(BaseModel):
     merchant_id: UUID4
     configuration: MerchantConfiguration
+
+class HandlerConfigurationSchemaResponse(BaseModel):
+    title: str
+    configuration_schema: dict

@@ -77,6 +77,12 @@ if __name__ == "__main__":
             "http://psp-card-handler-backend:9000/",
         ),
         (
+            "psp-paypal-handler-backend",
+            "PSP PayPal Internal API",
+            "http://internal-paypal.psp.%s.nip.io/api/v1/",
+            "http://psp-paypal-handler-backend:9000/",
+        ),
+        (
             "unicredit-bank-reverse-proxy",
             "Unicredit Bank Payment Page",
             "http://unicredit.%s.nip.io/",

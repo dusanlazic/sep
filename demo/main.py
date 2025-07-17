@@ -26,6 +26,7 @@ PSP_CRYPTO_PAYMENT_PAGE = os.getenv("PSP_CRYPTO_PAYMENT_PAGE")
 PSP_CRYPTO_PUBLIC_FACING_API = os.getenv("PSP_CRYPTO_PUBLIC_FACING_API")
 PSP_CRYPTO_INTERNAL_API = os.getenv("PSP_CRYPTO_INTERNAL_API")
 PSP_CARD_INTERNAL_API = os.getenv("PSP_CARD_INTERNAL_API")
+PSP_PAYPAL_INTERNAL_API = os.getenv("PSP_PAYPAL_INTERNAL_API")
 BANK_PAYMENT_PAGE = os.getenv("BANK_PAYMENT_PAGE")
 BANK_API = os.getenv("BANK_API")
 
@@ -161,6 +162,28 @@ def admin_add_payment_method_card():
     print_json(data=response.json())
 
 
+def admin_add_payment_method_paypal():
+    logger.info("Adding paypal payment method...")
+
+    parsed_url = urlparse(PSP_PAYPAL_INTERNAL_API)
+
+    payload = {
+        "host": parsed_url.hostname,
+        "port": parsed_url.port,
+        "name": "paypal",
+    }
+
+    print("paypal payload", payload)
+
+    response = requests.post(
+        PSP_PUBLIC_FACING_API + "payment-methods",
+        json=payload,
+        cookies={"access_token": "hey_its_admin"},
+    )
+
+    print_json(data=response.json())
+
+
 def merchant_update_own_config(token: str):
     logger.info("Updating own configuration...")
 
@@ -192,6 +215,10 @@ payment_methods:
         bank_name: unicredit
         bank_merchant_id: bc26c127-8670-4814-9e13-0e120d838e80
         bank_merchant_password: 8Nl574GES1jmQjUvBqpDBhuhOLvU5QZ
+
+    - name: paypal
+      config:
+        paypal_merchant_email: test@example.com
 """
 
     payload = {"yaml": yaml}
@@ -268,6 +295,7 @@ if __name__ == "__main__":
     admin_list_payment_methods()
     admin_add_payment_method_bitcoin()
     admin_add_payment_method_card()
+    admin_add_payment_method_paypal()
     admin_list_payment_methods()
 
     # Configure new merchant

@@ -14,6 +14,8 @@ from .schemas import (
     TransactionProceedRequest,
     TransactionProceedResponse,
     ConfigureMerchantRequest,
+    MerchantConfiguration,
+    HandlerConfigurationSchemaResponse,
 )
 from .database import get_db
 from .models import Merchant, Transaction, TransactionStatus
@@ -143,6 +145,7 @@ def add_new_merchant(
     """
     Add a new merchant to the handler and configure it.
     """
+    print('aaaaa', merchant_create_request)
     merchant = (
         db.query(Merchant)
         .filter_by(psp_id=str(merchant_create_request.merchant_id))
@@ -155,6 +158,7 @@ def add_new_merchant(
         psp_id=merchant_create_request.merchant_id,
         paypal_merchant_email=merchant_create_request.configuration.paypal_merchant_email,
     )
+    print(new_merchant)
     db.add(new_merchant)
     db.commit()
 
@@ -164,7 +168,7 @@ def add_new_merchant(
 @router.post(
     "/transactions",
     response_model=TransactionProceedResponse,
-    tags=["PayPal Handler"],
+    tags=["PSP Core"],
 )
 def proceed_with_transaction(
     transaction_proceed_request: TransactionProceedRequest,
@@ -218,7 +222,7 @@ def proceed_with_transaction(
 @router.get(
     "/transactions/{transaction_id}",
     response_model=TransactionDetailsResponse,
-    tags=["PayPal Handler"],
+    tags=["PSP Core"],
 )
 def get_transaction(transaction_id: uuid.UUID, db: Session = Depends(get_db)):
     """
@@ -243,7 +247,7 @@ def get_transaction(transaction_id: uuid.UUID, db: Session = Depends(get_db)):
     )
 
 
-@router.post("/transactions/events", tags=["PayPal Handler"])
+@router.post("/transactions/events")
 async def paypal_webhook(request: Request, db: Session = Depends(get_db)):
     """
     PayPal Webhook endpoint. Updates Transaction status based on PayPal events.
@@ -296,3 +300,19 @@ async def paypal_webhook(request: Request, db: Session = Depends(get_db)):
 
     db.commit()
     return {"status": "updated", "order_id": order_id, "new_status": txn.status.value}
+
+
+@router.get(
+    "/schema",
+    response_model=HandlerConfigurationSchemaResponse,
+    tags=["PSP Core"],
+)
+def get_handler_configuration_schema():
+    """
+    Get information that describes the handler and how merchants
+    should configure it.
+    """
+    return HandlerConfigurationSchemaResponse(
+        title="Pay With PayPal",
+        configuration_schema=MerchantConfiguration.model_json_schema(),
+    )

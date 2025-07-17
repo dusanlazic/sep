@@ -19,6 +19,7 @@ touch telecom/backend/app/main.py
 touch psp/core/backend/app/main.py
 touch psp/crypto-handler/backend/app/main.py
 touch psp/card-handler/backend/app/main.py
+touch psp/paypal-handler/backend/app/main.py
 touch bank/unicredit/backend/app/main.py
 touch bank/erste/backend/app/main.py
 
