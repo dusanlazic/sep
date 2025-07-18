@@ -173,8 +173,6 @@ def admin_add_payment_method_paypal():
         "name": "paypal",
     }
 
-    print("paypal payload", payload)
-
     response = requests.post(
         PSP_PUBLIC_FACING_API + "payment-methods",
         json=payload,
@@ -218,7 +216,7 @@ payment_methods:
 
     - name: paypal
       config:
-        paypal_merchant_email: test@example.com
+        paypal_merchant_email: sb-kwmoi32116156@business.example.com
 """
 
     payload = {"yaml": yaml}

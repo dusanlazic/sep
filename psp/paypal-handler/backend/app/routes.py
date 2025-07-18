@@ -34,19 +34,12 @@ def _get_cached_token() -> str:
     if env in _token_cache and _token_cache[env][1] > now:
         return _token_cache[env][0]
 
-    # Clean credentials and ensure proper encoding
     client_id = config.paypal_client_id.strip()
     client_secret = config.paypal_client_secret.strip()
     
-    # Create Basic auth header with proper encoding
     credentials = f"{client_id}:{client_secret}"
     auth_hdr = base64.b64encode(credentials.encode('utf-8')).decode('utf-8')
     
-    # Debug: Print the auth header (remove in production)
-    print(f"Debug - Client ID length: {len(client_id)}")
-    print(f"Debug - Client Secret length: {len(client_secret)}")
-    print(f"Debug - Auth header: {auth_hdr[:20]}...")
-
     try:
         r = requests.post(
             f"{config.paypal_api_base}/v1/oauth2/token",
@@ -59,11 +52,7 @@ def _get_cached_token() -> str:
         )
         r.raise_for_status()
     except requests.RequestException as exc:
-        print(f"Debug - HTTP Exception: {exc}")
         if hasattr(exc, 'response') and exc.response is not None:
-            print(f"Debug - HTTP Status: {exc.response.status_code}")
-            print(f"Debug - Response Headers: {dict(exc.response.headers)}")
-            print(f"Debug - Response Body: {exc.response.text}")
             raise HTTPException(502, f"PayPal auth failed: {exc.response.text!s}")
         else:
             raise HTTPException(502, f"PayPal auth failed: {str(exc)}")
@@ -73,13 +62,11 @@ def _get_cached_token() -> str:
     return _token_cache[env][0]
 
 
-def _create_paypal_order(amount: float, success: str, cancel: str) -> tuple[str, str]:
+def _create_paypal_order(amount: float, merchant_email: str, success: str, cancel: str) -> tuple[str, str]:
     """
     Returns (order_id, approve_url)
     """
     token = _get_cached_token()
-
-    print("TOKEN IS: ", token)
 
     order_body = {
         "intent": "CAPTURE",
@@ -88,6 +75,9 @@ def _create_paypal_order(amount: float, success: str, cancel: str) -> tuple[str,
                 "amount": {
                     "currency_code": "EUR",
                     "value": f"{amount:.2f}",
+                },
+                "payee": {
+                    "email_address": merchant_email,
                 }
             }
         ],
@@ -122,8 +112,6 @@ def _create_paypal_order(amount: float, success: str, cancel: str) -> tuple[str,
 
     data = r.json()
 
-    print("DATA IS: ", data)
-
     approve = next(
         (l["href"] for l in data["links"] if l["rel"] in ("approve", "payer-action")),
         None
@@ -145,7 +133,6 @@ def add_new_merchant(
     """
     Add a new merchant to the handler and configure it.
     """
-    print('aaaaa', merchant_create_request)
     merchant = (
         db.query(Merchant)
         .filter_by(psp_id=str(merchant_create_request.merchant_id))
@@ -158,7 +145,6 @@ def add_new_merchant(
         psp_id=merchant_create_request.merchant_id,
         paypal_merchant_email=merchant_create_request.configuration.paypal_merchant_email,
     )
-    print(new_merchant)
     db.add(new_merchant)
     db.commit()
 
@@ -190,6 +176,7 @@ def proceed_with_transaction(
     try:
         order_id, approve_url = _create_paypal_order(
             amount=transaction_proceed_request.amount,
+            merchant_email = merchant.paypal_merchant_email,
             success=transaction_proceed_request.next_urls.success,
             cancel=transaction_proceed_request.next_urls.failure,
         )
