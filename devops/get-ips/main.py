@@ -59,6 +59,12 @@ if __name__ == "__main__":
             None,
         ),
         (
+            "psp-qr-handler-reverse-proxy",
+            "PSP QR Payment Page",
+            "http://qr.psp.%s.nip.io/",
+            None,
+        ),
+        (
             "psp-crypto-handler-reverse-proxy",
             "PSP Crypto Public-Facing API",
             "http://crypto.psp.%s.nip.io/api/v1/",
@@ -81,6 +87,12 @@ if __name__ == "__main__":
             "PSP PayPal Internal API",
             "http://internal-paypal.psp.%s.nip.io/api/v1/",
             "http://psp-paypal-handler",  # Consul service name
+        ),
+        (
+            "psp-qr-handler-backend",
+            "PSP QR Internal API",
+            "http://internal-qr.psp.%s.nip.io/api/v1/",
+            "http://psp-qr-handler-backend:9000/",
         ),
         (
             "unicredit-bank-reverse-proxy",

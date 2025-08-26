@@ -71,6 +71,12 @@ if __name__ == "__main__":
             "CONSUL_HOST",
         ),
         (
+            "psp-qr-handler-reverse-proxy",
+            "qr.psp.%s.nip.io",
+            "../../psp/qr-handler/backend/.env",
+            "FRONTEND_HOST",
+        ),
+        (
             "psp-core-reverse-proxy",
             "psp.%s.nip.io",
             "../../psp/core/backend/.env",
@@ -87,12 +93,6 @@ if __name__ == "__main__":
             "http://psp.%s.nip.io/api/v1",
             "../../psp/paypal-handler/backend/.env",
             "PSP_API_BASE_URL",
-        ),
-        (
-            "consul",
-            "http://consul.%s.nip.io:8500",
-            "../../psp/paypal-handler/backend/.env",
-            "CONSUL_HOST",
         ),
         (
             "psp-core-reverse-proxy",

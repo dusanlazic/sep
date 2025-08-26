@@ -27,6 +27,7 @@ PSP_CRYPTO_PUBLIC_FACING_API = os.getenv("PSP_CRYPTO_PUBLIC_FACING_API")
 PSP_CRYPTO_INTERNAL_API = os.getenv("PSP_CRYPTO_INTERNAL_API")
 PSP_CARD_INTERNAL_API = os.getenv("PSP_CARD_INTERNAL_API")
 PSP_PAYPAL_INTERNAL_API = os.getenv("PSP_PAYPAL_INTERNAL_API")
+PSP_QR_INTERNAL_API = os.getenv("PSP_QR_INTERNAL_API")
 BANK_PAYMENT_PAGE = os.getenv("BANK_PAYMENT_PAGE")
 BANK_API = os.getenv("BANK_API")
 
@@ -179,6 +180,26 @@ def admin_add_payment_method_paypal():
     print_json(data=response.json())
 
 
+def admin_add_payment_method_qr():
+    logger.info("Adding qr payment method...")
+
+    parsed_url = urlparse(PSP_QR_INTERNAL_API)
+
+    payload = {
+        "host": parsed_url.hostname,
+        "port": parsed_url.port,
+        "name": "qr",
+    }
+
+    response = requests.post(
+        PSP_PUBLIC_FACING_API + "payment-methods",
+        json=payload,
+        cookies={"access_token": "hey_its_admin"},
+    )
+
+    print_json(data=response.json())
+
+
 def merchant_update_own_config(token: str):
     logger.info("Updating own configuration...")
 
@@ -214,6 +235,11 @@ payment_methods:
     - name: paypal
       config:
         paypal_merchant_email: sb-kwmoi32116156@business.example.com
+
+    - name: qr
+      config:
+        merchant_name: Telekom Srbija
+        merchant_account_number: 845000000040484987
 """
 
     payload = {"yaml": yaml}
@@ -291,6 +317,7 @@ if __name__ == "__main__":
     admin_add_payment_method_bitcoin()
     admin_add_payment_method_card()
     admin_add_payment_method_paypal()
+    admin_add_payment_method_qr()
     admin_list_payment_methods()
 
     # Configure new merchant
