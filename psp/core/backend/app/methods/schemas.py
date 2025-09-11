@@ -12,9 +12,7 @@ class PaymentMethodResponse(BaseModel):
 
 class PaymentMethodCreateRequest(BaseModel):
     name: str = Field(description="Name of the payment method")
-    host: str = Field(description="Host of the payment method")
-    port: int = Field(description="Port of the payment method", ge=1, le=65535)
-    # TODO: Replace host and port with Consul service name maybe?
+    service_name: str = Field(description="Consul service name of the payment method")
 
 
 class MerchantPaymentMethodConfigurationResponse(BaseModel):

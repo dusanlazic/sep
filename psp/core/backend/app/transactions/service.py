@@ -1,3 +1,4 @@
+import os
 from urllib.parse import urlencode, urlunparse
 from uuid import UUID
 
@@ -7,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from ..config import config
+from ..discovery import resolve
 from ..merchants.models import Merchant
 from ..methods.models import PaymentMethod
 from .models import Transaction, TransactionStatus
@@ -69,8 +71,10 @@ def get_payment_url(db: Session, transaction_id: UUID, payment_method_name: str)
         raise HTTPException(status_code=404, detail="Payment method not supported.")
 
     try:
+        host, port = resolve(payment_method.service_name)
+
         response = requests.post(
-            f"http://{payment_method.host}:{payment_method.port}/transactions",
+            f"http://{host}:{port}/transactions",
             json={
                 "id": str(transaction.id),
                 "merchant_id": str(transaction.merchant_id),

@@ -8,9 +8,10 @@ services:
       POSTGRES_DB: dbname
 
   psp-crypto-handler-backend:
-    container_name: psp-crypto-handler-backend
-    image: fastapi-hot-reload
-    command: bash -c "uv run fastapi dev --host 0.0.0.0 --port 9000 --root-path /api/v1"
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: bash -c "fastapi dev app/main.py --host 0.0.0.0 --port 9000 --root-path /api/v1"
     user: "${UID}:${GID}"
     healthcheck:
       test: curl --fail http://localhost:9000/health || exit 1
@@ -18,12 +19,15 @@ services:
       timeout: 5s
       retries: 3
       start_period: 3s
-    volumes:
-      - ./backend:/backend
-    working_dir: /backend
+    restart: always
     depends_on:
       psp-crypto-handler-db:
         condition: service_started
+    volumes:
+      - ./backend/.env:/app/.env:ro
+    deploy:
+      mode: replicated
+      replicas: 6
 
   psp-crypto-handler-reverse-proxy:
     container_name: psp-crypto-handler-reverse-proxy

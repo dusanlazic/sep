@@ -68,19 +68,19 @@ if __name__ == "__main__":
             "psp-crypto-handler-reverse-proxy",
             "PSP Crypto Internal API",
             "http://internal-crypto.psp.%s.nip.io/api/v1/",
-            "http://psp-crypto-handler-backend:9000/",
+            "http://psp-crypto-handler",  # Consul service name
         ),
         (
             "psp-card-handler-backend",
             "PSP Card Internal API",
             "http://internal-card.psp.%s.nip.io/api/v1/",
-            "http://psp-card-handler-backend:9000/",
+            "http://psp-card-handler",  # Consul service name
         ),
         (
             "psp-paypal-handler-backend",
             "PSP PayPal Internal API",
             "http://internal-paypal.psp.%s.nip.io/api/v1/",
-            "http://psp-paypal-handler-backend:9000/",
+            "http://psp-paypal-handler",  # Consul service name
         ),
         (
             "unicredit-bank-reverse-proxy",

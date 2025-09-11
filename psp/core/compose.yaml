@@ -24,6 +24,8 @@ services:
     depends_on:
       psp-core-db:
         condition: service_started
+      consul:
+        condition: service_started
 
   psp-core-reverse-proxy:
     container_name: psp-core-reverse-proxy
@@ -34,3 +36,12 @@ services:
     depends_on:
       psp-core-backend:
         condition: service_started
+
+  consul:
+    image: hashicorp/consul:1.18
+    container_name: consul
+    command: agent -dev -ui -client=0.0.0.0 -bind=0.0.0.0
+    ports:
+      - "8500:8500"         # HTTP API + UI
+      - "8600:8600/tcp"     # DNS (TCP)
+      - "8600:8600/udp"     # DNS (UDP)

@@ -44,8 +44,7 @@ def add_payment_method(
     return service.add_payment_method(
         db,
         new_payment_method.name,
-        new_payment_method.host,
-        new_payment_method.port,
+        new_payment_method.service_name,
     )
 
 

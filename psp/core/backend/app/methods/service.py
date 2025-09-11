@@ -7,6 +7,7 @@ from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from ..discovery import resolve
 from ..merchants.models import Merchant
 from .models import PaymentMethod
 
@@ -32,7 +33,7 @@ def apply_merchant_payment_methods_configuration(
         raise HTTPException(
             status_code=400, detail="Failed to parse YAML configuration"
         )
-    
+
     for payment_method in new_config["payment_methods"]:
         name: str = payment_method["name"]
         config: dict = payment_method["config"]
@@ -50,8 +51,10 @@ def apply_merchant_payment_methods_configuration(
 
             print(payload)
 
+            host, port = resolve(payment_method.service_name)
+
             response = requests.post(
-                f"http://{payment_method.host}:{payment_method.port}/merchants",
+                f"http://{host}:{port}/merchants",
                 json=payload,
             )
             print(response)
@@ -77,7 +80,8 @@ def get_payment_methods(db: Session) -> list[PaymentMethod]:
     return db.query(PaymentMethod).all()
 
 
-def add_payment_method(db: Session, name: str, host: str, port: int) -> PaymentMethod:
+def add_payment_method(db: Session, name: str, service_name: str) -> PaymentMethod:
+    host, port = resolve(service_name)
     response = requests.get(f"http://{host}:{port}/schema")
     response.raise_for_status()
 
@@ -88,8 +92,7 @@ def add_payment_method(db: Session, name: str, host: str, port: int) -> PaymentM
         name=name,
         title=title,
         configuration_schema=config_schema,
-        host=host,
-        port=port,
+        service_name=service_name,
     )
     try:
         db.add(new_payment_method)

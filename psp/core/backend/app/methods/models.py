@@ -18,5 +18,4 @@ class PaymentMethod(Base):
     name: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     title: Mapped[str] = mapped_column(String, nullable=False)
     configuration_schema: Mapped[dict] = mapped_column(JSONB, nullable=False)
-    host: Mapped[str] = mapped_column(String, nullable=False)
-    port: Mapped[int] = mapped_column(String, nullable=False)
+    service_name: Mapped[str] = mapped_column(String, nullable=False)

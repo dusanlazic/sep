@@ -65,16 +65,34 @@ if __name__ == "__main__":
             "FRONTEND_HOST",
         ),
         (
+            "consul",
+            "http://consul.%s.nip.io:8500",
+            "../../psp/crypto-handler/backend/.env",
+            "CONSUL_HOST",
+        ),
+        (
             "psp-core-reverse-proxy",
             "psp.%s.nip.io",
             "../../psp/core/backend/.env",
             "FRONTEND_HOST",
         ),
         (
+            "consul",
+            "http://consul.%s.nip.io:8500",
+            "../../psp/core/backend/.env",
+            "CONSUL_HOST",
+        ),
+        (
             "psp-core-reverse-proxy",
             "http://psp.%s.nip.io/api/v1",
             "../../psp/paypal-handler/backend/.env",
             "PSP_API_BASE_URL",
+        ),
+        (
+            "consul",
+            "http://consul.%s.nip.io:8500",
+            "../../psp/paypal-handler/backend/.env",
+            "CONSUL_HOST",
         ),
         (
             "psp-core-reverse-proxy",
@@ -105,6 +123,12 @@ if __name__ == "__main__":
             "http://erste.%s.nip.io/api/v1/",
             "../../psp/card-handler/backend/.env",
             "POPULATE_ERSTE_BANK_API_URL",
+        ),
+        (
+            "consul",
+            "http://consul.%s.nip.io:8500",
+            "../../psp/card-handler/backend/.env",
+            "CONSUL_HOST",
         ),
         (
             "unicredit-bank-reverse-proxy",

@@ -128,9 +128,8 @@ def admin_add_payment_method_bitcoin():
     parsed_url = urlparse(PSP_CRYPTO_INTERNAL_API)
 
     payload = {
-        "host": parsed_url.hostname,
-        "port": parsed_url.port,
         "name": "bitcoin",
+        "service_name": parsed_url.hostname,
     }
 
     response = requests.post(
@@ -148,9 +147,8 @@ def admin_add_payment_method_card():
     parsed_url = urlparse(PSP_CARD_INTERNAL_API)
 
     payload = {
-        "host": parsed_url.hostname,
-        "port": parsed_url.port,
         "name": "card",
+        "service_name": parsed_url.hostname,
     }
 
     response = requests.post(
@@ -168,9 +166,8 @@ def admin_add_payment_method_paypal():
     parsed_url = urlparse(PSP_PAYPAL_INTERNAL_API)
 
     payload = {
-        "host": parsed_url.hostname,
-        "port": parsed_url.port,
         "name": "paypal",
+        "service_name": parsed_url.hostname,
     }
 
     response = requests.post(
