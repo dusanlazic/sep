@@ -186,9 +186,8 @@ def admin_add_payment_method_qr():
     parsed_url = urlparse(PSP_QR_INTERNAL_API)
 
     payload = {
-        "host": parsed_url.hostname,
-        "port": parsed_url.port,
         "name": "qr",
+        "service_name": parsed_url.hostname,
     }
 
     response = requests.post(

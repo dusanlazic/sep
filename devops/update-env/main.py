@@ -77,6 +77,12 @@ if __name__ == "__main__":
             "FRONTEND_HOST",
         ),
         (
+            "consul",
+            "http://consul.%s.nip.io:8500",
+            "../../psp/qr-handler/backend/.env",
+            "CONSUL_HOST",
+        ),
+        (
             "psp-core-reverse-proxy",
             "psp.%s.nip.io",
             "../../psp/core/backend/.env",

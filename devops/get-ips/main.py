@@ -92,7 +92,7 @@ if __name__ == "__main__":
             "psp-qr-handler-backend",
             "PSP QR Internal API",
             "http://internal-qr.psp.%s.nip.io/api/v1/",
-            "http://psp-qr-handler-backend:9000/",
+            "http://psp-qr-handler",
         ),
         (
             "unicredit-bank-reverse-proxy",
