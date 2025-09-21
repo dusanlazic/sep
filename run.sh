@@ -20,6 +20,7 @@ touch psp/core/backend/app/main.py
 touch psp/crypto-handler/backend/app/main.py
 touch psp/card-handler/backend/app/main.py
 touch psp/paypal-handler/backend/app/main.py
+touch psp/qr-handler/backend/app/main.py
 touch bank/unicredit/backend/app/main.py
 touch bank/erste/backend/app/main.py
 
@@ -30,6 +31,8 @@ npm install --prefix psp/core/frontend
 npm run build --prefix psp/core/frontend
 npm install --prefix psp/crypto-handler/frontend
 npm run build --prefix psp/crypto-handler/frontend
+npm install --prefix psp/qr-handler/frontend
+npm run build --prefix psp/qr-handler/frontend
 npm install --prefix bank/erste/frontend
 npm run build --prefix bank/erste/frontend
 npm install --prefix bank/unicredit/frontend
