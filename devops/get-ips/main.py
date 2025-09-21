@@ -112,6 +112,12 @@ if __name__ == "__main__":
             "http://pcc.%s.nip.io/api/v1/",
             "http://pcc-backend:9000/",
         ),
+        (
+            "consul",
+            "Consul UI",
+            "http://consul.%s.nip.io/",
+            None,
+        ),
     ]
 
     client = docker.from_env()
