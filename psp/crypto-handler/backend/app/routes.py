@@ -150,3 +150,27 @@ def get_transaction(transaction_id: uuid.UUID, db: Session = Depends(get_db)):
         },
         status=transaction.status.value,
     )
+
+
+@router.put(
+    "/transactions/{transaction_id}/status",
+    tags=["Handler Frontend"],
+)
+def update_transaction_status(
+    transaction_id: uuid.UUID,
+    db: Session = Depends(get_db),
+):
+    """
+    Update the status of a transaction to COMPLETED.
+    """
+    transaction = db.query(Transaction).filter_by(id=transaction_id).first()
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found.")
+
+    if transaction.status == TransactionStatus.COMPLETED:
+        raise HTTPException(status_code=400, detail="Transaction is already completed.")
+
+    transaction.status = TransactionStatus.COMPLETED
+    db.commit()
+
+    return {"message": "Transaction status updated to COMPLETED."}
